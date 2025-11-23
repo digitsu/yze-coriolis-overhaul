@@ -124,9 +124,9 @@ jobs:
           --data '{
               "id": "${{env.package_id}}",
               "release": {
-                  "version": "${{ steps.release_pr.outputs.tag_name }}",
-                  "manifest": "https://github.com/${{github.repository}}/releases/download/${{steps.release_pr.outputs.tag_name}}/${{ env.package_type }}.json",
-                  "notes": "https://github.com/${{github.repository}}/releases/tag/${{steps.release_pr.outputs.tag_name}}",
+                  "version": "${{ steps.release_pr.outputs.version }}",
+                  "manifest": "https://github.com/${{github.repository}}/releases/download/${{steps.release_pr.outputs.version}}/${{ env.package_type }}.json",
+                  "notes": "https://github.com/${{github.repository}}/releases/tag/${{steps.release_pr.outputs.version}}",
                   "compatibility": ${{ env.COMPATIBILITY }}
               }
           }')
