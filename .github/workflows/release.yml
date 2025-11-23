@@ -30,6 +30,8 @@ jobs:
         if: ${{ steps.release_pr.outputs.pr && !steps.release_pr.outputs.release_created }}
         with:
           script: |
+            console.log("PR Number: " + ${{ steps.release_pr.outputs.pr.number }});
+            console.log("PR: " + JSON.stringify(${{ steps.release_pr.outputs.pr }}));")
             const response = await github.pulls.get({
               pull_number: ${{ steps.release_pr.outputs.pr.number }},
               owner: context.repo.owner,
