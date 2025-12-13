@@ -23,6 +23,18 @@ function normalizeName(name) {
   return name.toLowerCase().trim().replace(/[^\w\s]/g, '');
 }
 
+// Check if item should be ignored (NPC natural weapons, creature armor, etc.)
+function shouldIgnoreItem(itemName, conversionData) {
+  if (!conversionData.ignoredPatterns) return false;
+
+  for (const pattern of conversionData.ignoredPatterns) {
+    if (itemName.includes(pattern)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // Find matching weapon data
 function findWeaponData(itemName, conversionData) {
   const normalized = normalizeName(itemName);
@@ -82,6 +94,12 @@ function findArmorData(itemName, conversionData) {
 
 // Convert a single weapon item
 async function convertWeapon(item, conversionData, dryRun = false) {
+  // Check if this item should be ignored (NPC natural weapons, etc.)
+  if (shouldIgnoreItem(item.name, conversionData)) {
+    console.log(`⏭️ Skipping NPC/creature weapon: ${item.name}`);
+    return { success: false, item: item.name, reason: 'Ignored (NPC/creature)', ignored: true };
+  }
+
   const weaponData = findWeaponData(item.name, conversionData);
 
   if (!weaponData) {
@@ -117,6 +135,12 @@ async function convertWeapon(item, conversionData, dryRun = false) {
 
 // Convert a single armor item
 async function convertArmor(item, conversionData, dryRun = false) {
+  // Check if this item should be ignored (creature armor, etc.)
+  if (shouldIgnoreItem(item.name, conversionData)) {
+    console.log(`⏭️ Skipping NPC/creature armor: ${item.name}`);
+    return { success: false, item: item.name, reason: 'Ignored (NPC/creature)', ignored: true };
+  }
+
   const armorData = findArmorData(item.name, conversionData);
 
   if (!armorData) {
@@ -149,7 +173,18 @@ async function convertAllItems(dryRun = true) {
   console.log('='.repeat(60));
 
   const conversionData = await loadConversionData();
-  const results = { weapons: [], armor: [], unmatched: [] };
+  const results = { weapons: [], armor: [], unmatched: [], ignored: [] };
+
+  // Helper to categorize results
+  function categorizeResult(result, results) {
+    if (result.success) {
+      return; // Already handled by caller
+    } else if (result.ignored) {
+      results.ignored.push(result);
+    } else {
+      results.unmatched.push(result);
+    }
+  }
 
   // Convert world items
   console.log('\n📦 Converting World Items...');
@@ -157,11 +192,11 @@ async function convertAllItems(dryRun = true) {
     if (item.type === 'weapon') {
       const result = await convertWeapon(item, conversionData, dryRun);
       if (result.success) results.weapons.push(result);
-      else results.unmatched.push(result);
+      else categorizeResult(result, results);
     } else if (item.type === 'armor') {
       const result = await convertArmor(item, conversionData, dryRun);
       if (result.success) results.armor.push(result);
-      else results.unmatched.push(result);
+      else categorizeResult(result, results);
     }
   }
 
@@ -173,11 +208,11 @@ async function convertAllItems(dryRun = true) {
       if (item.type === 'weapon') {
         const result = await convertWeapon(item, conversionData, dryRun);
         if (result.success) results.weapons.push(result);
-        else results.unmatched.push(result);
+        else categorizeResult(result, results);
       } else if (item.type === 'armor') {
         const result = await convertArmor(item, conversionData, dryRun);
         if (result.success) results.armor.push(result);
-        else results.unmatched.push(result);
+        else categorizeResult(result, results);
       }
     }
   }
@@ -188,10 +223,18 @@ async function convertAllItems(dryRun = true) {
   console.log('='.repeat(60));
   console.log(`✅ Weapons converted: ${results.weapons.length}`);
   console.log(`✅ Armor converted: ${results.armor.length}`);
+  console.log(`⏭️ Ignored (NPC/creature): ${results.ignored.length}`);
   console.log(`⚠️ Unmatched items: ${results.unmatched.length}`);
 
+  if (results.ignored.length > 0) {
+    console.log('\nIgnored items (NPC natural weapons, creature armor):');
+    for (const item of results.ignored) {
+      console.log(`  - ${item.item}`);
+    }
+  }
+
   if (results.unmatched.length > 0) {
-    console.log('\nUnmatched items:');
+    console.log('\nUnmatched items (may need aliases added):');
     for (const item of results.unmatched) {
       console.log(`  - ${item.item}`);
     }
@@ -215,21 +258,31 @@ async function convertActorItems(actorName, dryRun = true) {
 
   console.log(`Converting items for actor: ${actor.name}`);
   const conversionData = await loadConversionData();
-  const results = { weapons: [], armor: [], unmatched: [] };
+  const results = { weapons: [], armor: [], unmatched: [], ignored: [] };
+
+  // Helper to categorize results
+  function categorizeResult(result) {
+    if (result.ignored) {
+      results.ignored.push(result);
+    } else {
+      results.unmatched.push(result);
+    }
+  }
 
   for (const item of actor.items) {
     if (item.type === 'weapon') {
       const result = await convertWeapon(item, conversionData, dryRun);
       if (result.success) results.weapons.push(result);
-      else results.unmatched.push(result);
+      else categorizeResult(result);
     } else if (item.type === 'armor') {
       const result = await convertArmor(item, conversionData, dryRun);
       if (result.success) results.armor.push(result);
-      else results.unmatched.push(result);
+      else categorizeResult(result);
     }
   }
 
   console.log(`\nConverted: ${results.weapons.length} weapons, ${results.armor.length} armor`);
+  console.log(`Ignored: ${results.ignored.length} (NPC/creature items)`);
   console.log(`Unmatched: ${results.unmatched.length} items`);
 
   return results;
