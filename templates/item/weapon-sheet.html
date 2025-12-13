@@ -31,11 +31,20 @@
                         data-dtype="String" />
                 </div>
 
-                <div class="resource numeric-input flexrow">
+                {{#unless combatOverhaul}}
+                <div class="resource numeric-input flexrow core-rules-only">
                     <label class="resource-label">{{localize "YZECORIOLIS.CritTypeNumeric"}}</label>
                     <input type="number" min="0" name="system.crit.numericValue" value="{{system.crit.numericValue}}"
                         data-dtype="Number" />
                 </div>
+                {{/unless}}
+                {{#if combatOverhaul}}
+                <div class="resource numeric-input flexrow overhaul-rules-only">
+                    <label class="resource-label">{{localize "YZECORIOLIS.CritThreshold"}}</label>
+                    <input type="number" min="0" name="system.critThreshold" value="{{system.critThreshold}}"
+                        data-dtype="Number" />
+                </div>
+                {{/if}}
 
                 <div class="resource numeric-input flexrow">
                     <label class="resource-label">{{localize "YZECORIOLIS.CritTypeCustom"}}</label>

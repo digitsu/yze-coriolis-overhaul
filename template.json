@@ -304,6 +304,7 @@
         "numericValue": 0,
         "customValue": ""
       },
+      "critThreshold": 0,
       "explosive": false,
       "blastRadius": "",
       "blastPower": 0,
