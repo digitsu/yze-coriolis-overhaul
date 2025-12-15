@@ -241,6 +241,49 @@
         </div>
         {{/if}}
     </div>
+    {{!-- Combat Overhaul Damage Calculator --}}
+    {{#if combatOverhaul}}
+      {{#if_eq rollType 'weapon'}}
+        {{#unless results.failure}}
+        <div class="damage-calculator-section">
+          <hr>
+          <details class="damage-calculator">
+            <summary><strong>{{localize "YZECORIOLIS.DamageCalculator"}}</strong></summary>
+            <div class="damage-calc-inputs" style="margin-top: 0.5em;">
+              <div class="flexrow" style="gap: 0.5em; align-items: center;">
+                <label style="flex: 1;">{{localize "YZECORIOLIS.ExtraDamage"}}:</label>
+                <input type="number" class="calc-extra-damage" value="0" min="0" max="{{results.successes}}" style="width: 3em; text-align: center;">
+              </div>
+              <div class="flexrow" style="gap: 0.5em; align-items: center; margin-top: 0.3em;">
+                <label style="flex: 1;">{{localize "YZECORIOLIS.TargetDR"}}:</label>
+                <input type="number" class="calc-target-dr" value="0" min="0" max="10" style="width: 3em; text-align: center;">
+              </div>
+              <input type="hidden" class="calc-base-damage" value="{{damage}}">
+              <input type="hidden" class="calc-armor-pen" value="{{armorPenetration}}">
+              <input type="hidden" class="calc-crit-threshold" value="{{crit}}">
+              <button type="button" class="calc-damage-btn" style="margin-top: 0.5em; width: 100%;">{{localize "YZECORIOLIS.Calculate"}}</button>
+            </div>
+            <div class="damage-calc-result" style="margin-top: 0.5em; display: none;">
+              <table style="border: 0; width: 100%;">
+                <tr>
+                  <td>{{localize "YZECORIOLIS.EffectiveDR"}}:</td>
+                  <td class="result-effective-dr" style="text-align: right; font-weight: bold;">-</td>
+                </tr>
+                <tr>
+                  <td>{{localize "YZECORIOLIS.FinalDamage"}}:</td>
+                  <td class="result-final-damage" style="text-align: right; font-weight: bold;">-</td>
+                </tr>
+              </table>
+              <div class="result-critical" style="display: none; text-align: center; margin-top: 0.5em; padding: 0.3em; background: #8b0000; color: white; font-weight: bold;">
+                {{localize "YZECORIOLIS.CriticalTriggered"}}
+                <div class="result-crit-severity" style="font-size: 0.9em; font-weight: normal;"></div>
+              </div>
+            </div>
+          </details>
+        </div>
+        {{/unless}}
+      {{/if_eq}}
+    {{/if}}
 </div>
 
 {{#if hasExtraText}}

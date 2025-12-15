@@ -95,7 +95,8 @@ export class yzecoriolisItem extends Item {
       armorPenetration: itemData.armorPenetration || 0,
       damageReduction: itemData.damageReduction || 0,
       range: itemData.range,
-      crit: itemData.crit?.numericValue,
+      crit: combatOverhaul ? itemData.critThreshold : itemData.crit?.numericValue,
+      critThreshold: itemData.critThreshold || 0,
       critText: itemData.crit?.customValue,
       features: itemData.special
         ? Object.values(itemData.special).join(", ")

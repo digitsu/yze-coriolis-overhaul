@@ -443,6 +443,7 @@ function getPrayerModifiersChecked(rollData) {
 }
 
 export async function coriolisChatListeners(html) {
+  // Push roll listener
   $(html).on("click", ".dice-push", (ev) => {
     let button = $(ev.currentTarget),
       messageId = button.parents(".message").attr("data-message-id"),
@@ -460,6 +461,51 @@ export async function coriolisChatListeners(html) {
         results.rollData,
         originalRoll
       ).render(true);
+    }
+  });
+
+  // Combat Overhaul Damage Calculator listener
+  $(html).on("click", ".calc-damage-btn", (ev) => {
+    const button = $(ev.currentTarget);
+    const container = button.closest(".damage-calculator");
+
+    // Get input values
+    const baseDamage = parseInt(container.find(".calc-base-damage").val()) || 0;
+    const extraDamage = parseInt(container.find(".calc-extra-damage").val()) || 0;
+    const targetDR = parseInt(container.find(".calc-target-dr").val()) || 0;
+    const armorPen = parseInt(container.find(".calc-armor-pen").val()) || 0;
+    const critThreshold = parseInt(container.find(".calc-crit-threshold").val()) || 0;
+
+    // Calculate damage
+    const totalDamage = baseDamage + extraDamage;
+    const effectiveDR = Math.max(0, targetDR - armorPen);
+    const finalDamage = Math.max(0, totalDamage - effectiveDR);
+
+    // Check for critical
+    const critTriggered = critThreshold > 0 && finalDamage >= critThreshold;
+    const critSeverity = critTriggered ? Math.floor(finalDamage / critThreshold) : 0;
+
+    // Update result display
+    const resultDiv = container.find(".damage-calc-result");
+    resultDiv.show();
+    resultDiv.find(".result-effective-dr").text(effectiveDR);
+    resultDiv.find(".result-final-damage").text(finalDamage);
+
+    // Show/hide critical indicator
+    const critDiv = resultDiv.find(".result-critical");
+    if (critTriggered) {
+      critDiv.show();
+      let severityText = "";
+      if (critSeverity === 1) {
+        severityText = game.i18n.localize("YZECORIOLIS.CritSeverityNormal");
+      } else if (critSeverity === 2) {
+        severityText = game.i18n.localize("YZECORIOLIS.CritSeverityDouble");
+      } else if (critSeverity > 2) {
+        severityText = game.i18n.format("YZECORIOLIS.CritSeverityMultiple", { count: critSeverity });
+      }
+      critDiv.find(".result-crit-severity").text(severityText);
+    } else {
+      critDiv.hide();
     }
   });
 }
@@ -526,4 +572,45 @@ function createAutomaticFireFormula(totalDice, numberOfIgnoredOnes) {
     formula = formula + ", 1d6x>1";
   }
   return `{${formula}}`;
+}
+
+/**
+ * Combat Overhaul: Calculate final damage after armor
+ * @param {number} baseDamage - Weapon's base damage
+ * @param {number} extraDamage - Extra damage from spending successes
+ * @param {number} damageReduction - Target's DR (from armor)
+ * @param {number} armorPenetration - Weapon's AP
+ * @returns {number} Final damage dealt
+ */
+export function calculateOverhaulDamage(baseDamage, extraDamage, damageReduction, armorPenetration) {
+  const totalDamage = baseDamage + extraDamage;
+  const effectiveDR = Math.max(0, damageReduction - armorPenetration);
+  return Math.max(0, totalDamage - effectiveDR);
+}
+
+/**
+ * Combat Overhaul: Check if damage triggers a critical injury
+ * @param {number} finalDamage - Damage after DR subtraction
+ * @param {number} critThreshold - Weapon's crit threshold
+ * @returns {object} { triggered: boolean, severity: number }
+ */
+export function checkOverhaulCritical(finalDamage, critThreshold) {
+  if (critThreshold <= 0) {
+    return { triggered: false, severity: 0 };
+  }
+  const triggered = finalDamage >= critThreshold;
+  const severity = triggered ? Math.floor(finalDamage / critThreshold) : 0;
+  return { triggered, severity };
+}
+
+/**
+ * Combat Overhaul: Get severity description
+ * @param {number} severity - Critical severity level
+ * @returns {string} Description of severity effect
+ */
+export function getCriticalSeverityText(severity) {
+  if (severity <= 0) return "";
+  if (severity === 1) return game.i18n.localize("YZECORIOLIS.CritSeverityNormal");
+  if (severity === 2) return game.i18n.localize("YZECORIOLIS.CritSeverityDouble");
+  return game.i18n.format("YZECORIOLIS.CritSeverityMultiple", { count: severity });
 }
