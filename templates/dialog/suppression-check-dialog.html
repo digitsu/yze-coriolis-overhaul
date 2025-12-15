@@ -1,0 +1,27 @@
+<form>
+  <p style="margin-bottom: 1em;">
+    {{localize "YZECORIOLIS.SuppressionCheckFor"}} <strong>{{actorName}}</strong>
+  </p>
+  <p style="margin-bottom: 1em;">
+    {{localize "YZECORIOLIS.CurrentStress"}}: <strong>{{currentStress}}</strong>
+  </p>
+  <hr>
+  <h4>{{localize "YZECORIOLIS.Modifiers"}}</h4>
+  <div class="form-group">
+    <label>
+      <input type="checkbox" name="stun">
+      {{localize "YZECORIOLIS.SuppressionModStun"}} (+2)
+    </label>
+  </div>
+  <div class="form-group">
+    <label>
+      <input type="checkbox" name="threatening">
+      {{localize "YZECORIOLIS.SuppressionModThreatening"}} (+2)
+    </label>
+  </div>
+  <div class="form-group">
+    <label>{{localize "YZECORIOLIS.SuppressionShellShockSuccesses"}}:</label>
+    <input type="number" name="shellShock" value="0" min="0" max="10" style="width: 4em;">
+    <span style="font-size: 0.9em;">(+2 {{localize "YZECORIOLIS.PerSuccess"}})</span>
+  </div>
+</form>

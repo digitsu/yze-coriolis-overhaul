@@ -1,0 +1,56 @@
+<div class="dice-roll yzecoriolis suppression-check">
+  <div>
+    <h2>{{localize "YZECORIOLIS.SuppressionCheck"}}</h2>
+    <p style="margin: 0.3em 0;">{{actorName}}</p>
+    <hr>
+    <table style="border: 0; width: 100%;">
+      <tr>
+        <td>{{localize "YZECORIOLIS.Roll"}}:</td>
+        <td style="text-align: right;">1d6 = <strong>{{dieResult}}</strong></td>
+      </tr>
+      <tr>
+        <td>{{localize "YZECORIOLIS.Stress"}}:</td>
+        <td style="text-align: right;">+{{currentStress}}</td>
+      </tr>
+      {{#if_gt modifier 0}}
+      <tr>
+        <td>{{localize "YZECORIOLIS.Modifiers"}}:</td>
+        <td style="text-align: right;">+{{modifier}}</td>
+      </tr>
+      {{#if modifierSources}}
+      <tr>
+        <td colspan="2" style="font-size: 0.9em; font-style: italic;">{{modifierSources}}</td>
+      </tr>
+      {{/if}}
+      {{/if_gt}}
+      <tr>
+        <td><strong>{{localize "YZECORIOLIS.Total"}}:</strong></td>
+        <td style="text-align: right;"><strong>{{total}}</strong></td>
+      </tr>
+    </table>
+  </div>
+  <div class="dice-result" style="margin-top: 0.5em;">
+    {{#if_eq result 'unaffected'}}
+    <h4 class="dice-total criticalSuccess" style="background: #18520b;">{{effect}}</h4>
+    {{/if_eq}}
+    {{#if_eq result 'shaken'}}
+    <h4 class="dice-total limitedSuccess" style="background: #c09a1e;">{{effect}}</h4>
+    <p style="text-align: center; margin: 0.3em 0;">+1 {{localize "YZECORIOLIS.Stress"}}</p>
+    {{/if_eq}}
+    {{#if_eq result 'suppressed'}}
+    <h4 class="dice-total criticalfailure" style="background: #aa3300;">{{effect}}</h4>
+    <p style="text-align: center; margin: 0.3em 0;">+1 {{localize "YZECORIOLIS.Stress"}}</p>
+    <p style="text-align: center; margin: 0.3em 0; font-weight: bold;">{{localize "YZECORIOLIS.SuppressionLoseFast"}}</p>
+    {{/if_eq}}
+    {{#if_eq result 'pinnedDown'}}
+    <h4 class="dice-total criticalfailure" style="background: #8b0000;">{{effect}}</h4>
+    <p style="text-align: center; margin: 0.3em 0;">+1 {{localize "YZECORIOLIS.Stress"}}</p>
+    <p style="text-align: center; margin: 0.3em 0; font-weight: bold;">{{localize "YZECORIOLIS.SuppressionLoseSlow"}}</p>
+    {{/if_eq}}
+    {{#if_gt stressGain 0}}
+    <p style="text-align: center; font-size: 0.9em; margin-top: 0.5em;">
+      {{localize "YZECORIOLIS.Stress"}}: {{currentStress}} → {{newStress}}
+    </p>
+    {{/if_gt}}
+  </div>
+</div>

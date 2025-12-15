@@ -6,7 +6,7 @@ import { yzecoriolisActorSheet } from "./actor/actor-sheet.js";
 import { yzecoriolisShipSheet } from "./actor/ship-sheet.js";
 import { yzecoriolisItem } from "./item/item.js";
 import { yzecoriolisItemSheet } from "./item/item-sheet.js";
-import { coriolisChatListeners } from "./coriolis-roll.js";
+import { coriolisChatListeners, promptSuppressionCheck, rollSuppressionCheck } from "./coriolis-roll.js";
 import {
   getAttributeKeyForWeaponType,
   getSkillKeyForWeaponType,
@@ -30,6 +30,9 @@ Hooks.once("init", async function () {
     rollItemMacro,
     config: YZECORIOLIS,
     migrations: migrations,
+    // Combat Overhaul functions
+    promptSuppressionCheck,
+    rollSuppressionCheck,
   };
 
   // Setup TinyMCE stylings

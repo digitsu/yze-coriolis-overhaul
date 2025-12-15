@@ -24,6 +24,9 @@ export const preloadHandlerbarsTemplates = async function () {
     "systems/yzecoriolis/templates/dialog/roll-itemModifiers.html",
     "systems/yzecoriolis/templates/dialog/roll-shipGunner.html",
     "systems/yzecoriolis/templates/dialog/roll-modifiers.html",
+    // Combat Overhaul templates
+    "systems/yzecoriolis/templates/sidebar/suppression-check.html",
+    "systems/yzecoriolis/templates/dialog/suppression-check-dialog.html",
   ];
 
   return loadTemplates(templatePaths);

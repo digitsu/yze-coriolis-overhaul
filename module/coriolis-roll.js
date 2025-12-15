@@ -508,6 +508,49 @@ export async function coriolisChatListeners(html) {
       critDiv.hide();
     }
   });
+
+  // Combat Overhaul Suppression Check button listener
+  $(html).on("click", ".roll-suppression-btn", (ev) => {
+    ev.preventDefault();
+    // Get selected token's actor, or prompt user to select one
+    const tokens = canvas.tokens?.controlled;
+    if (tokens && tokens.length === 1) {
+      promptSuppressionCheck(tokens[0].actor);
+    } else if (tokens && tokens.length > 1) {
+      ui.notifications.warn(game.i18n.localize("YZECORIOLIS.SelectOneToken"));
+    } else {
+      // No token selected, show a dialog to pick an actor
+      const actors = game.actors.filter(a => a.type === "character" || a.type === "npc");
+      if (actors.length === 0) {
+        ui.notifications.warn(game.i18n.localize("YZECORIOLIS.SuppressionNoActor"));
+        return;
+      }
+
+      const options = actors.map(a => `<option value="${a.id}">${a.name}</option>`).join("");
+      new Dialog({
+        title: game.i18n.localize("YZECORIOLIS.SuppressionCheck"),
+        content: `<form><div class="form-group"><label>${game.i18n.localize("YZECORIOLIS.SelectActor")}:</label><select name="actor">${options}</select></div></form>`,
+        buttons: {
+          ok: {
+            icon: '<i class="fas fa-check"></i>',
+            label: game.i18n.localize("YZECORIOLIS.OK"),
+            callback: (html) => {
+              const actorId = html.find('[name="actor"]').val();
+              const actor = game.actors.get(actorId);
+              if (actor) {
+                promptSuppressionCheck(actor);
+              }
+            }
+          },
+          cancel: {
+            icon: '<i class="fas fa-times"></i>',
+            label: game.i18n.localize("YZECORIOLIS.Cancel")
+          }
+        },
+        default: "ok"
+      }).render(true);
+    }
+  });
 }
 /**
  * Add support for the Dice So Nice module
@@ -613,4 +656,168 @@ export function getCriticalSeverityText(severity) {
   if (severity === 1) return game.i18n.localize("YZECORIOLIS.CritSeverityNormal");
   if (severity === 2) return game.i18n.localize("YZECORIOLIS.CritSeverityDouble");
   return game.i18n.format("YZECORIOLIS.CritSeverityMultiple", { count: severity });
+}
+
+/**
+ * Combat Overhaul: Roll a Suppression Check
+ * Called when a character is hit by ranged fire
+ * @param {Actor} actor - The actor making the suppression check
+ * @param {Object} options - Optional modifiers
+ * @param {boolean} options.stun - Weapon has Stun feature (+2)
+ * @param {boolean} options.threatening - Weapon is Threatening (+2)
+ * @param {number} options.shellShock - Shell Shock bonus from grenades
+ * @returns {Object} Result of the suppression check
+ */
+export async function rollSuppressionCheck(actor, options = {}) {
+  const currentStress = actor.system.stress?.value || 0;
+
+  // Calculate modifiers
+  let modifier = 0;
+  const modifierSources = [];
+
+  if (options.stun) {
+    modifier += 2;
+    modifierSources.push(game.i18n.localize("YZECORIOLIS.SuppressionModStun"));
+  }
+  if (options.threatening) {
+    modifier += 2;
+    modifierSources.push(game.i18n.localize("YZECORIOLIS.SuppressionModThreatening"));
+  }
+  if (options.shellShock && options.shellShock > 0) {
+    modifier += options.shellShock * 2;
+    modifierSources.push(game.i18n.format("YZECORIOLIS.SuppressionModShellShock", { bonus: options.shellShock * 2 }));
+  }
+
+  // Roll 1d6
+  const roll = new Roll("1d6");
+  await roll.evaluate({ async: false });
+  const dieResult = roll.total;
+
+  // Calculate total
+  const total = dieResult + currentStress + modifier;
+
+  // Determine result
+  let result, effect, stressGain, loseFastAction, loseSlowAction;
+
+  if (total <= 2) {
+    result = "unaffected";
+    effect = game.i18n.localize("YZECORIOLIS.SuppressionUnaffected");
+    stressGain = 0;
+    loseFastAction = false;
+    loseSlowAction = false;
+  } else if (total <= 5) {
+    result = "shaken";
+    effect = game.i18n.localize("YZECORIOLIS.SuppressionShaken");
+    stressGain = 1;
+    loseFastAction = false;
+    loseSlowAction = false;
+  } else if (total <= 8) {
+    result = "suppressed";
+    effect = game.i18n.localize("YZECORIOLIS.SuppressionSuppressed");
+    stressGain = 1;
+    loseFastAction = true;
+    loseSlowAction = false;
+  } else {
+    result = "pinnedDown";
+    effect = game.i18n.localize("YZECORIOLIS.SuppressionPinnedDown");
+    stressGain = 1;
+    loseFastAction = false;
+    loseSlowAction = true;
+  }
+
+  // Prepare chat data
+  const chatData = {
+    actorName: actor.name,
+    actorId: actor.id,
+    dieResult: dieResult,
+    currentStress: currentStress,
+    modifier: modifier,
+    modifierSources: modifierSources.join(", "),
+    total: total,
+    result: result,
+    effect: effect,
+    stressGain: stressGain,
+    newStress: currentStress + stressGain,
+    loseFastAction: loseFastAction,
+    loseSlowAction: loseSlowAction
+  };
+
+  // Show chat message
+  const html = await renderTemplate(
+    "systems/yzecoriolis/templates/sidebar/suppression-check.html",
+    chatData
+  );
+
+  const chatOptions = {
+    user: game.user.id,
+    speaker: ChatMessage.getSpeaker({ actor: actor }),
+    content: html,
+    rolls: [roll],
+    sound: CONFIG.sounds.dice
+  };
+
+  await ChatMessage.create(chatOptions);
+
+  // Update actor stress and status (if user owns the actor)
+  if (actor.isOwner) {
+    const updateData = {};
+    if (stressGain > 0) {
+      updateData["system.stress.value"] = Math.min(currentStress + stressGain, 10);
+    }
+    if (loseFastAction) {
+      updateData["system.suppressed"] = true;
+    }
+    if (loseSlowAction) {
+      updateData["system.pinnedDown"] = true;
+    }
+    if (Object.keys(updateData).length > 0) {
+      await actor.update(updateData);
+    }
+  }
+
+  return {
+    roll: roll,
+    result: result,
+    stressGain: stressGain,
+    loseFastAction: loseFastAction,
+    loseSlowAction: loseSlowAction
+  };
+}
+
+/**
+ * Open suppression check dialog for an actor
+ * @param {Actor} actor - The actor to check
+ */
+export async function promptSuppressionCheck(actor) {
+  if (!actor) {
+    ui.notifications.warn(game.i18n.localize("YZECORIOLIS.SuppressionNoActor"));
+    return;
+  }
+
+  const content = await renderTemplate(
+    "systems/yzecoriolis/templates/dialog/suppression-check-dialog.html",
+    { actorName: actor.name, currentStress: actor.system.stress?.value || 0 }
+  );
+
+  new Dialog({
+    title: game.i18n.localize("YZECORIOLIS.SuppressionCheck"),
+    content: content,
+    buttons: {
+      roll: {
+        icon: '<i class="fas fa-dice"></i>',
+        label: game.i18n.localize("YZECORIOLIS.Roll"),
+        callback: async (html) => {
+          const stun = html.find('[name="stun"]').is(':checked');
+          const threatening = html.find('[name="threatening"]').is(':checked');
+          const shellShock = parseInt(html.find('[name="shellShock"]').val()) || 0;
+          await rollSuppressionCheck(actor, { stun, threatening, shellShock });
+        }
+      },
+      cancel: {
+        icon: '<i class="fas fa-times"></i>',
+        label: game.i18n.localize("YZECORIOLIS.Cancel")
+      }
+    },
+    default: "roll"
+  }).render(true);
 }

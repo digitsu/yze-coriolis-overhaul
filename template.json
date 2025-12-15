@@ -205,7 +205,14 @@
         },
         "birr": 0,
         "movementRate": 10,
-        "keyArt": ""
+        "keyArt": "",
+        "stress": {
+          "value": 0,
+          "min": 0,
+          "max": 10
+        },
+        "suppressed": false,
+        "pinnedDown": false
       }
     },
     "character": {
