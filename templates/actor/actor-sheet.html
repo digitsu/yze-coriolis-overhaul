@@ -101,6 +101,51 @@
             <span class="bar-value">{{system.reputation.value}}</span>
           </div>
         </li>
+        {{#if combatOverhaul}}
+        <li class="entry flexrow stress-entry">
+          <div class="stat-label">{{localize "YZECORIOLIS.Stress"}}</div>
+          <div class="bar stress-bar fr-basic">
+            {{#each stressBlocks as |sBlock index|}}
+            {{#with ../system as | system |}}
+            {{#if sBlock.on}}
+            <div class="bar-segment bar-rounded on" data-name="system.stress.value" data-index={{index}}
+              data-current={{system.stress.value}} data-min={{system.stress.min}} data-max={{system.stress.max}}>
+            </div>
+            {{else}}
+            <div class="bar-segment bar-rounded off" data-name="system.stress.value" data-index={{index}}
+              data-current={{system.stress.value}} data-min={{system.stress.min}} data-max={{system.stress.max}}>
+            </div>
+            {{/if}}
+            {{/with}}
+            {{/each}}
+            <span class="bar-value">{{system.stress.value}}</span>
+          </div>
+        </li>
+        {{#if system.suppressed}}
+        <li class="entry flexrow suppression-status">
+          <div class="stat-label" style="color: #aa3300; font-weight: bold;">
+            <i class="fas fa-shield-alt"></i> {{localize "YZECORIOLIS.Suppressed"}}
+          </div>
+          <div class="number">
+            <button type="button" class="clear-suppressed" title="{{localize "YZECORIOLIS.ClearStatus"}}">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </li>
+        {{/if}}
+        {{#if system.pinnedDown}}
+        <li class="entry flexrow suppression-status">
+          <div class="stat-label" style="color: #8b0000; font-weight: bold;">
+            <i class="fas fa-crosshairs"></i> {{localize "YZECORIOLIS.PinnedDown"}}
+          </div>
+          <div class="number">
+            <button type="button" class="clear-pinned" title="{{localize "YZECORIOLIS.ClearStatus"}}">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </li>
+        {{/if}}
+        {{/if}}
         <li class="entry flexrow">
           <div class="capitalize stat-label">{{localize "YZECORIOLIS.MovementRate"}}</div>
           <div class="number" style="display:inline-flex; padding-inline:2em;">

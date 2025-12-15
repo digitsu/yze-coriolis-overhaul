@@ -180,6 +180,7 @@
   "YZECORIOLIS.CurrentStress": "Current Stress",
   "YZECORIOLIS.Suppressed": "Suppressed",
   "YZECORIOLIS.PinnedDown": "Pinned Down",
+  "YZECORIOLIS.ClearStatus": "Clear Status",
   "YZECORIOLIS.SuppressionCheck": "Suppression Check",
   "YZECORIOLIS.SuppressionCheckFor": "Suppression check for",
   "YZECORIOLIS.SuppressionUnaffected": "Unaffected",

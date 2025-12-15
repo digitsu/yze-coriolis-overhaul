@@ -96,6 +96,13 @@ export class yzecoriolisActorSheet extends ActorSheet {
         sysData.mindPoints.max
       ),
 
+      // Combat Overhaul: Stress tracking
+      stressBlocks: prepDataBarBlocks(
+        sysData.stress?.value || 0,
+        sysData.stress?.max || 10
+      ),
+      combatOverhaul: game.settings.get("yzecoriolis", "combatOverhaul"),
+
       // we augment the sheet with our 'current' option so that the selection menu
       // can be driven by it.
       crewOptions: buildCrewOptionsArray(),
@@ -253,6 +260,16 @@ export class yzecoriolisActorSheet extends ActorSheet {
     html.find(".bar-segment").click(this._onClickBarSegment.bind(this));
     html.find(".bar-segment").mouseenter(onHoverBarSegmentIn);
     html.find(".bar").mouseleave(onHoverBarOut);
+
+    // Combat Overhaul: Clear suppression status buttons
+    html.find(".clear-suppressed").click((ev) => {
+      ev.preventDefault();
+      this.actor.update({ "system.suppressed": false });
+    });
+    html.find(".clear-pinned").click((ev) => {
+      ev.preventDefault();
+      this.actor.update({ "system.pinnedDown": false });
+    });
 
     // Update Inventory Item
     html.find(".item-edit").click((ev) => {
