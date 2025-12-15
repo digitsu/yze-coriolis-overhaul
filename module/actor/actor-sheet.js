@@ -528,6 +528,7 @@ export class yzecoriolisActorSheet extends ActorSheet {
       }
     }
 
+    const combatOverhaul = game.settings.get("yzecoriolis", "combatOverhaul");
     const rollData = {
       actorType: this.actor.type,
       rollType: dataset.rolltype,
@@ -547,11 +548,15 @@ export class yzecoriolisActorSheet extends ActorSheet {
       blastRadius: item?.blastRadius,
       damage: item?.damage,
       damageText: item?.damageText,
+      armorPenetration: item?.armorPenetration || 0,
+      damageReduction: item?.damageReduction || 0,
       range: item?.range,
-      crit: item?.crit?.numericValue,
+      crit: combatOverhaul ? item?.critThreshold : item?.crit?.numericValue,
+      critThreshold: item?.critThreshold || 0,
       critText: item?.crit?.customValue,
       features: item?.special ? Object.values(item.special).join(", ") : "",
       itemModifiers: itemModifiers,
+      combatOverhaul: combatOverhaul,
     };
     const chatOptions = this.actor._prepareChatRollOptions(
       "systems/yzecoriolis/templates/sidebar/roll.html",
