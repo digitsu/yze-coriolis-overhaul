@@ -83,6 +83,8 @@ Hooks.once("init", async function () {
 
   /**
    * Set an initiative formula for the system
+   * Default is Core Rules: 1d6 with decimal tiebreaker
+   * Combat Overhaul uses D66 (set in ready hook after settings load)
    * @type {String}
    */
   CONFIG.Combat.initiative = {
@@ -388,6 +390,16 @@ Hooks.on("getSceneControlButtons", (controls) => {
 });
 
 Hooks.once("ready", async function () {
+  // Combat Overhaul: Set D66 initiative formula if enabled
+  const combatOverhaul = game.settings.get("yzecoriolis", "combatOverhaul");
+  if (combatOverhaul) {
+    CONFIG.Combat.initiative = {
+      formula: "(1d6 * 10) + 1d6",
+      decimals: 0,
+    };
+    console.log("Coriolis | Combat Overhaul: Using D66 initiative system");
+  }
+
   // Determine whether a system migration is required and feasible
 
   if (document.body.classList.contains('theme-dark')) {
