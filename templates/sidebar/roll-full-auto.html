@@ -1,0 +1,145 @@
+<div class="dice-roll yzecoriolis full-auto-attack">
+  <div>
+    <h2 style="white-space: pre-wrap;">{{title}}</h2>
+    <table style="border: 0;">
+      <!-- Weapon info -->
+      {{#if_eq rollType 'weapon'}}
+        <tr>
+          <td colspan="2">{{localize "YZECORIOLIS.Damage"}}: {{damage}} {{#if damageText}}({{damageText}}){{/if}}{{#if_gt armorPenetration 0}} | {{localize "YZECORIOLIS.ArmorPenetrationShort"}}: {{armorPenetration}}{{/if_gt}}</td>
+        </tr>
+        <tr>
+          <td colspan="2">{{localize "YZECORIOLIS.Crit"}}: {{#if_gt crit 0}}{{crit}}{{else}}-{{/if_gt}} {{#if critText}}({{critText}}){{/if}}</td>
+        </tr>
+        <tr>
+          <td>{{localize "YZECORIOLIS.Range"}}: {{range}}</td>
+          <td>{{localize "YZECORIOLIS.Automatic"}}-{{localize "YZECORIOLIS.Weapon"}}</td>
+        </tr>
+        {{#if features}}
+          <tr>
+            <td colspan="2">{{localize "YZECORIOLIS.Features"}}: {{features}}</td>
+          </tr>
+        {{/if}}
+        <tr>
+          <td colspan="2"><hr></td>
+        </tr>
+      {{/if_eq}}
+      <!-- Roll info -->
+      <tr>
+        <td>{{attributeName}}: {{attribute}}</td>
+        <td>{{#if skillName}}{{skillName}}: {{skill}}{{/if}}</td>
+      </tr>
+      <tr>
+        <td>{{localize "YZECORIOLIS.ModifierForRoll"}}: {{modifier}}</td>
+        <td>{{localize "YZECORIOLIS.Bonus"}}: {{bonus}}</td>
+      </tr>
+      {{#if itemModifiersChecked}}
+        <tr>
+          <td style="vertical-align: top;">{{localize "YZECORIOLIS.ItemModifiersOther"}}:</td>
+          <td style="white-space: pre-wrap;">{{itemModifiersChecked}}</td>
+        </tr>
+      {{/if}}
+      <!-- Full Auto info -->
+      <tr>
+        <td colspan="2"><hr></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <strong>{{localize "YZECORIOLIS.FullAutoOverhaul"}}</strong>
+          {{#if hasMachinegunner}}<br><em>+ {{localize "YZECORIOLIS.TalentMachinegunner"}} ({{localize "YZECORIOLIS.FullAutoNoMod"}})</em>{{/if}}
+          {{#if hasHighCapacity}}<br><em>+ {{localize "YZECORIOLIS.FeatureWeaponHighCapacity"}} (+1 {{localize "YZECORIOLIS.FullAutoAttack"}})</em>{{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <strong>{{localize "YZECORIOLIS.FullAutoAttacks"}}:</strong> {{numAttacks}} @ {{totalDice}}d6 each
+          {{#unless hasMachinegunner}}(-2){{/unless}}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Individual Attack Results -->
+  <div class="dice-result full-auto-results">
+    <h4 style="margin-bottom: 0.5em;">{{localize "YZECORIOLIS.FullAutoResults"}}</h4>
+    {{#each attacks}}
+    <div class="full-auto-attack-result" style="margin-bottom: 0.5em; padding: 0.3em; border: 1px solid #444; border-radius: 3px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <strong>{{localize "YZECORIOLIS.FullAutoAttack"}} {{attackNum}}</strong>
+        {{#if failure}}
+          <span class="dice-total criticalfailure" style="padding: 0.2em 0.5em; font-size: 0.9em;">{{localize "YZECORIOLIS.RollFailure"}}</span>
+        {{else if limitedSuccess}}
+          <span class="dice-total limitedSuccess" style="padding: 0.2em 0.5em; font-size: 0.9em;">{{localize "YZECORIOLIS.RollLimitedSucces"}} ({{successes}})</span>
+        {{else if criticalSuccess}}
+          <span class="dice-total criticalSuccess" style="padding: 0.2em 0.5em; font-size: 0.9em;">{{localize "YZECORIOLIS.RollCriticalSucces"}} ({{successes}})</span>
+        {{/if}}
+      </div>
+      {{{tooltip}}}
+    </div>
+    {{/each}}
+
+    <!-- Summary -->
+    <div class="full-auto-summary" style="margin-top: 0.5em; padding: 0.5em; background: rgba(0,0,0,0.2); border-radius: 3px;">
+      <table style="border: 0; width: 100%;">
+        <tr>
+          <td><strong>{{localize "YZECORIOLIS.FullAutoTotalHits"}}:</strong></td>
+          <td style="text-align: right;">{{totalHits}} / {{numAttacks}}</td>
+        </tr>
+        <tr>
+          <td><strong>{{localize "YZECORIOLIS.FullAutoTotalSuccesses"}}:</strong></td>
+          <td style="text-align: right;">{{totalSuccesses}}</td>
+        </tr>
+      </table>
+    </div>
+
+    {{!-- Damage calculators for each hit --}}
+    {{#if_gt totalHits 0}}
+    <div class="full-auto-damage-section" style="margin-top: 0.5em;">
+      <hr>
+      <details class="damage-calculator">
+        <summary><strong>{{localize "YZECORIOLIS.DamageCalculator"}}</strong></summary>
+        <div style="margin-top: 0.5em;">
+          {{#each attacks}}
+            {{#unless failure}}
+            <div class="full-auto-hit-calc" data-attack="{{attackNum}}" style="margin-bottom: 0.5em; padding: 0.3em; border: 1px solid #555; border-radius: 3px;">
+              <strong>{{localize "YZECORIOLIS.FullAutoAttack"}} {{attackNum}}</strong> ({{successes}} {{localize "YZECORIOLIS.Successes"}})
+              <div class="damage-calc-inputs" style="margin-top: 0.3em;">
+                <div class="flexrow" style="gap: 0.5em; align-items: center;">
+                  <label style="flex: 1;">{{localize "YZECORIOLIS.ExtraDamage"}}:</label>
+                  <input type="number" class="calc-extra-damage" value="0" min="0" max="{{successes}}" style="width: 3em; text-align: center;">
+                </div>
+                <div class="flexrow" style="gap: 0.5em; align-items: center; margin-top: 0.3em;">
+                  <label style="flex: 1;">{{localize "YZECORIOLIS.TargetDR"}}:</label>
+                  <input type="number" class="calc-target-dr" value="0" min="0" max="10" style="width: 3em; text-align: center;">
+                </div>
+              </div>
+              <div class="damage-calc-result" style="margin-top: 0.3em; display: none;">
+                <table style="border: 0; width: 100%;">
+                  <tr>
+                    <td>{{localize "YZECORIOLIS.FinalDamage"}}:</td>
+                    <td class="result-final-damage" style="text-align: right; font-weight: bold;">-</td>
+                  </tr>
+                </table>
+                <div class="result-critical" style="display: none; text-align: center; margin-top: 0.3em; padding: 0.2em; background: #8b0000; color: white; font-weight: bold; font-size: 0.9em;">
+                  {{localize "YZECORIOLIS.CriticalTriggered"}}
+                </div>
+              </div>
+            </div>
+            {{/unless}}
+          {{/each}}
+          <input type="hidden" class="calc-base-damage" value="{{damage}}">
+          <input type="hidden" class="calc-armor-pen" value="{{armorPenetration}}">
+          <input type="hidden" class="calc-crit-threshold" value="{{crit}}">
+          <button type="button" class="calc-all-damage-btn" style="margin-top: 0.5em; width: 100%;">{{localize "YZECORIOLIS.CalculateAll"}}</button>
+          <button type="button" class="roll-suppression-btn" style="margin-top: 0.5em; width: 100%; display: none;">
+            <i class="fas fa-shield-alt"></i> {{localize "YZECORIOLIS.SuppressionCheck"}}
+          </button>
+        </div>
+      </details>
+    </div>
+    {{/if_gt}}
+
+    <div class="dice-formula dice-push yzecoriolis" style="margin-top: 0.5em;">
+      <em>{{localize "YZECORIOLIS.FullAutoNoPush"}}</em>
+    </div>
+  </div>
+</div>

@@ -27,6 +27,7 @@ export const preloadHandlerbarsTemplates = async function () {
     // Combat Overhaul templates
     "systems/yzecoriolis/templates/sidebar/suppression-check.html",
     "systems/yzecoriolis/templates/dialog/suppression-check-dialog.html",
+    "systems/yzecoriolis/templates/sidebar/roll-full-auto.html",
   ];
 
   return loadTemplates(templatePaths);

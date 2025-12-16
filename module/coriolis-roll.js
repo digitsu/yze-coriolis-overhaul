@@ -17,11 +17,18 @@ export async function coriolisRoll(chatOptions, rollData) {
     return;
   }
 
+  // Combat Overhaul: Use multi-attack system for automatic fire
+  const combatOverhaul = rollData.combatOverhaul;
+  const automaticFire = rollData.automaticFire;
+
+  if (combatOverhaul && automaticFire) {
+    return coriolisRollOverhaulFullAuto(chatOptions, rollData);
+  }
+
   let totalDice = getTotalDice(rollData);
   if (totalDice <= 0) {
     totalDice = 2; // desparation roll where both will have to be successes to be considered a success.
   }
-  const automaticFire = rollData.automaticFire;
   const formula = automaticFire
     ? createAutomaticFireFormula(totalDice, rollData.numberOfIgnoredOnes)
     : `${totalDice}d6`;
@@ -551,6 +558,48 @@ export async function coriolisChatListeners(html) {
       }).render(true);
     }
   });
+
+  // Combat Overhaul Full Auto damage calculator listener
+  $(html).on("click", ".calc-all-damage-btn", (ev) => {
+    const button = $(ev.currentTarget);
+    const container = button.closest(".full-auto-damage-section");
+
+    // Get global values
+    const baseDamage = parseInt(container.find(".calc-base-damage").val()) || 0;
+    const armorPen = parseInt(container.find(".calc-armor-pen").val()) || 0;
+    const critThreshold = parseInt(container.find(".calc-crit-threshold").val()) || 0;
+
+    // Calculate damage for each hit
+    container.find(".full-auto-hit-calc").each(function() {
+      const hitCalc = $(this);
+      const extraDamage = parseInt(hitCalc.find(".calc-extra-damage").val()) || 0;
+      const targetDR = parseInt(hitCalc.find(".calc-target-dr").val()) || 0;
+
+      // Calculate damage
+      const totalDamage = baseDamage + extraDamage;
+      const effectiveDR = Math.max(0, targetDR - armorPen);
+      const finalDamage = Math.max(0, totalDamage - effectiveDR);
+
+      // Check for critical
+      const critTriggered = critThreshold > 0 && finalDamage >= critThreshold;
+
+      // Update result display
+      const resultDiv = hitCalc.find(".damage-calc-result");
+      resultDiv.show();
+      resultDiv.find(".result-final-damage").text(finalDamage);
+
+      // Show/hide critical indicator
+      const critDiv = resultDiv.find(".result-critical");
+      if (critTriggered) {
+        critDiv.show();
+      } else {
+        critDiv.hide();
+      }
+    });
+
+    // Show suppression check button
+    container.find(".roll-suppression-btn").show();
+  });
 }
 /**
  * Add support for the Dice So Nice module
@@ -615,6 +664,170 @@ function createAutomaticFireFormula(totalDice, numberOfIgnoredOnes) {
     formula = formula + ", 1d6x>1";
   }
   return `{${formula}}`;
+}
+
+/**
+ * Combat Overhaul: Full Auto multi-attack system
+ * Makes 3 separate attacks at -2 each (4 with High Capacity)
+ * Machinegunner talent negates the -2 penalty
+ * @param {Object} chatOptions - Chat display options
+ * @param {Object} rollData - Roll data
+ */
+async function coriolisRollOverhaulFullAuto(chatOptions, rollData) {
+  // Calculate number of attacks: 3 base, +1 with High Capacity
+  const numAttacks = rollData.highCapacity ? 4 : 3;
+
+  // Machinegunner negates the -2 penalty
+  const fullAutoModifier = rollData.machineGunner ? 0 : -2;
+
+  // Calculate base dice (without the core rules -2 that's already applied)
+  // We need to recalculate without the automatic fire penalty since we apply our own
+  const baseAttribute = rollData.attribute;
+  const baseSkill = rollData.skill;
+  const baseBonus = rollData.bonus;
+  const modifier = rollData.modifier;
+  const itemModifierBonus = parseInt(getRollModifiersBonus(rollData));
+
+  // Base dice pool without any full auto modifier
+  let baseDicePool = baseAttribute + baseSkill + baseBonus + modifier + itemModifierBonus;
+
+  // Apply Combat Overhaul full auto modifier
+  let totalDice = baseDicePool + fullAutoModifier;
+
+  if (totalDice <= 0) {
+    totalDice = 2; // desperation roll
+  }
+
+  // Make multiple attack rolls
+  const attacks = [];
+  const allRolls = [];
+
+  for (let i = 0; i < numAttacks; i++) {
+    const formula = `${totalDice}d6`;
+    const roll = new Roll(formula);
+    await roll.evaluate({ async: false });
+    allRolls.push(roll);
+
+    // Evaluate this attack
+    let successes = 0;
+    const maxRoll = CONFIG.YZECORIOLIS.maxRoll;
+    roll.dice.forEach((part) => {
+      part.results.forEach((r) => {
+        if (r.result === maxRoll) {
+          successes++;
+        }
+      });
+    });
+
+    const isDesparation = totalDice <= 0;
+    const attackResult = {
+      attackNum: i + 1,
+      roll: roll,
+      successes: successes,
+      limitedSuccess: isDesparation ? successes === 2 : successes > 0 && successes < 3,
+      criticalSuccess: successes >= 3,
+      failure: isDesparation ? successes < 2 : successes === 0,
+      desparationRoll: isDesparation
+    };
+
+    attacks.push(attackResult);
+  }
+
+  // Calculate total successes and hits
+  const totalSuccesses = attacks.reduce((sum, a) => sum + a.successes, 0);
+  const totalHits = attacks.filter(a => !a.failure).length;
+
+  // Prepare result data
+  const resultData = {
+    desparationRoll: totalDice <= 0,
+    successes: totalSuccesses,
+    limitedSuccess: false,
+    criticalSuccess: false,
+    failure: totalHits === 0,
+    rollData: rollData,
+    pushed: rollData.pushed,
+    // Combat Overhaul full auto specific
+    isOverhaulFullAuto: true,
+    attacks: attacks,
+    numAttacks: numAttacks,
+    totalHits: totalHits,
+    totalSuccesses: totalSuccesses,
+    fullAutoModifier: fullAutoModifier,
+    dicePerAttack: totalDice
+  };
+
+  await showFullAutoMessage(chatOptions, resultData, allRolls);
+}
+
+/**
+ * Show chat message for Combat Overhaul Full Auto attack
+ */
+async function showFullAutoMessage(chatMsgOptions, resultData, rolls) {
+  // Generate tooltips for each attack
+  const attacksWithTooltips = [];
+  for (let i = 0; i < resultData.attacks.length; i++) {
+    const attack = resultData.attacks[i];
+    const tooltip = await renderTemplate(
+      "systems/yzecoriolis/templates/sidebar/dice-results.html",
+      getTooltipData({ successes: attack.successes, rollData: resultData.rollData }, attack.roll)
+    );
+    attacksWithTooltips.push({
+      ...attack,
+      tooltip: tooltip
+    });
+  }
+
+  let chatData = {
+    title: getRollTitle(resultData.rollData),
+    icon: getRollIconKey(resultData.rollData),
+    results: resultData,
+    attacks: attacksWithTooltips,
+    canPush: false, // Cannot push full auto attacks
+    totalDice: resultData.dicePerAttack,
+    actorType: getActorType(resultData.rollData),
+    rollType: getRollType(resultData.rollData),
+    attribute: getRollAttribute(resultData.rollData),
+    attributeName: getRollAttributeName(resultData.rollData),
+    skill: getRollSkill(resultData.rollData),
+    skillName: getRollSkillName(resultData.rollData),
+    modifier: getRollModifier(resultData.rollData),
+    isAutomatic: 'true',
+    isAutomaticActive: 'true',
+    isOverhaulFullAuto: true,
+    numAttacks: resultData.numAttacks,
+    totalHits: resultData.totalHits,
+    totalSuccesses: resultData.totalSuccesses,
+    fullAutoModifier: resultData.fullAutoModifier,
+    bonus: getRollBonus(resultData.rollData),
+    crit: getRollCrit(resultData.rollData),
+    critText: getRollCritText(resultData.rollData),
+    damage: getRollDmg(resultData.rollData),
+    damageText: getRollDmgText(resultData.rollData),
+    armorPenetration: getRollArmorPenetration(resultData.rollData),
+    damageReduction: getRollDamageReduction(resultData.rollData),
+    combatOverhaul: true,
+    range: getRollRange(resultData.rollData),
+    features: getRollFeatures(resultData.rollData),
+    itemModifiersBonus: getRollModifiersBonus(resultData.rollData),
+    itemModifiersChecked: getRollModifiersChecked(resultData.rollData),
+    hasMachinegunner: resultData.rollData.machineGunner ? true : false,
+    hasHighCapacity: resultData.rollData.highCapacity ? true : false
+  };
+
+  if (["gmroll", "blindroll"].includes(chatMsgOptions.rollMode))
+    chatMsgOptions["whisper"] = ChatMessage.getWhisperRecipients("GM");
+  if (chatMsgOptions.rollMode === "blindroll") chatMsgOptions["blind"] = true;
+  else if (chatMsgOptions.rollMode === "selfroll")
+    chatMsgOptions["whisper"] = [game.user];
+
+  // Use the first roll for the message
+  chatMsgOptions.roll = rolls[0];
+  const html = await renderTemplate("systems/yzecoriolis/templates/sidebar/roll-full-auto.html", chatData);
+  chatMsgOptions["content"] = html;
+  chatMsgOptions["rolls"] = rolls;
+  const msg = await ChatMessage.create(chatMsgOptions);
+  await msg.setFlag("yzecoriolis", "results", chatData.results);
+  return msg;
 }
 
 /**
