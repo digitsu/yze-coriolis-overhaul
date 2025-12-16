@@ -966,6 +966,7 @@ amending some classes to help official modules work in v13
   border: 1px solid #ffffff;
   box-sizing: border-box;
   border-radius: 10px;
+  cursor: pointer;
 }
 .yzecoriolis.sheet.actor .gradient-overlay {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.635714) 28.12%, #000000 72.92%);
@@ -974,21 +975,28 @@ amending some classes to help official modules work in v13
   grid-row-start: 2;
   grid-row-end: 4;
   z-index: 2;
+  pointer-events: none;
 }
 .yzecoriolis.sheet.actor .always-visible-stats {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.635714) 28.12%, #000000 72.92%);
   grid-column-start: 1;
   grid-column-end: 2;
-  grid-row-start: 3;
+  grid-row-start: 1;
   grid-row-end: 4;
   z-index: 3;
-  margin-top: -50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
 }
 .yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list {
   color: #e5e5e5;
   list-style: none;
   padding: 0px;
+  transform: translateY(-250px);
   margin: 0px;
+  margin-bottom: -250px;
+  pointer-events: auto;
 }
 .yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry {
   font-family: "Cairo";
@@ -1308,8 +1316,14 @@ amending some classes to help official modules work in v13
   cursor: pointer;
   padding: 1px 4px;
   font-size: 0.75em;
-  min-width: 40px;
+  min-width: 45px;
+  width: 45px;
   text-align: center;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-btn i.fas {
+  width: 1em;
+  text-align: center;
+  display: inline-block;
 }
 .yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-btn.available {
   background: rgba(0, 100, 0, 0.4);
@@ -1338,6 +1352,16 @@ amending some classes to help official modules work in v13
   border-color: #844;
   cursor: not-allowed;
 }
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-utility-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-left: 3px;
+  flex: 1;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-utility-buttons button {
+  width: 100%;
+}
 .yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-trade-btn,
 .yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-reset-btn {
   background: rgba(0, 0, 0, 0.3);
@@ -1348,10 +1372,14 @@ amending some classes to help official modules work in v13
   padding: 1px 4px;
   font-size: 0.75em;
 }
-.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-trade-btn:hover,
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-trade-btn:hover:not(.disabled),
 .yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-reset-btn:hover {
   background: rgba(0, 0, 0, 0.5);
   color: #fff;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-trade-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 .yzecoriolis.sheet.actor .char-content-wrapper {
   grid-column-start: 2;

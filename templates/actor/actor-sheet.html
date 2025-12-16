@@ -194,18 +194,20 @@
               {{/if}}
             {{/if}}
             {{!-- Trade/Reset buttons --}}
-            {{#unless system.actions.tradedSlow}}
-              {{#unless system.actions.slowUsed}}
-                {{#unless system.pinnedDown}}
-            <button type="button" class="action-trade-btn" title="{{localize "YZECORIOLIS.ActionTradeSlow"}}">
-              <i class="fas fa-exchange-alt"></i>
-            </button>
-                {{/unless}}
-              {{/unless}}
-            {{/unless}}
-            <button type="button" class="action-reset-btn" title="{{localize "YZECORIOLIS.ActionReset"}}">
-              <i class="fas fa-redo"></i>
-            </button>
+            <div class="action-utility-buttons">
+              {{#if (and (not system.actions.tradedSlow) (not system.actions.slowUsed) (not system.pinnedDown))}}
+              <button type="button" class="action-trade-btn" title="{{localize "YZECORIOLIS.ActionTradeSlow"}}">
+                <i class="fas fa-exchange-alt"></i>
+              </button>
+              {{else}}
+              <button type="button" class="action-trade-btn disabled" disabled title="{{localize "YZECORIOLIS.ActionTradeSlow"}}">
+                <i class="fas fa-exchange-alt"></i>
+              </button>
+              {{/if}}
+              <button type="button" class="action-reset-btn" title="{{localize "YZECORIOLIS.ActionReset"}}">
+                <i class="fas fa-redo"></i>
+              </button>
+            </div>
           </div>
         </li>
         {{/if}}
