@@ -219,7 +219,8 @@
           "fast2Used": false,
           "tradedSlow": false
         },
-        "primaryWeapon": ""
+        "primaryWeapon": "",
+        "cover": 0
       }
     },
     "character": {

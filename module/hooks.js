@@ -143,6 +143,21 @@ function createCombatTrackerActions(actor, canControl) {
   const tradeDisabled = (!canControl || !canTrade) ? "disabled" : "";
   const tradeClass = actions.tradedSlow ? "active" : "";
 
+  // Cover state: 0 = none, 1 = light, 2 = heavy
+  const cover = actor.system.cover || 0;
+  let coverIcon = "fa-user";
+  let coverClass = "none";
+  let coverTitle = game.i18n.localize("YZECORIOLIS.CoverNone");
+  if (cover === 1) {
+    coverIcon = "fa-shield-alt";
+    coverClass = "light";
+    coverTitle = game.i18n.localize("YZECORIOLIS.CoverLight");
+  } else if (cover === 2) {
+    coverIcon = "fa-shield-virus";
+    coverClass = "heavy";
+    coverTitle = game.i18n.localize("YZECORIOLIS.CoverHeavy");
+  }
+
   const disabled = canControl ? "" : "disabled";
 
   return `
@@ -155,6 +170,9 @@ function createCombatTrackerActions(actor, canControl) {
       </button>
       <button type="button" class="ct-trade-btn ${tradeClass}" data-action="trade" ${tradeDisabled} title="${game.i18n.localize("YZECORIOLIS.TradeSlowForFast")}">
         <i class="fas fa-exchange-alt"></i>
+      </button>
+      <button type="button" class="ct-cover-btn ${coverClass}" data-action="cover" ${disabled} title="${coverTitle}">
+        <i class="fas ${coverIcon}"></i>
       </button>
       <button type="button" class="ct-quick-attack" ${disabled} title="${game.i18n.localize("YZECORIOLIS.QuickAttack")}">
         <i class="fas fa-crosshairs"></i>
@@ -189,6 +207,14 @@ function setupCombatTrackerActionListeners(container, actor) {
     const actions = actor.system.actions || {};
     if (actor.system.pinnedDown || actions.slowUsed || actions.tradedSlow) return;
     await actor.update({ "system.actions.tradedSlow": true });
+  });
+
+  // Cover button - cycle through none (0) → light (1) → heavy (2) → none (0)
+  container.querySelector('[data-action="cover"]')?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    const currentCover = actor.system.cover || 0;
+    const newCover = (currentCover + 1) % 3;
+    await actor.update({ "system.cover": newCover });
   });
 
   // Quick attack button

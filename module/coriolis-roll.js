@@ -677,12 +677,56 @@ export async function coriolisChatListeners(html) {
 }
 
 /**
+ * Calculate an actor's total Damage Reduction from equipped armor + cover
+ * @param {Actor} actor - The actor to calculate DR for
+ * @returns {Object} - { baseDR, coverDR, totalDR, coverLevel }
+ */
+function calculateActorDR(actor) {
+  let baseDR = 0;
+  let coverDR = 0;
+  const coverLevel = actor.system.cover || 0;
+
+  // Get DR from equipped armor
+  for (const item of actor.items) {
+    if (item.type === "armor" && item.system.equipped) {
+      // Use damageReduction if available (Combat Overhaul), otherwise use armorRating
+      baseDR += item.system.damageReduction || item.system.armorRating || 0;
+    }
+  }
+
+  // Add cover bonus: light = 1, heavy = 2
+  coverDR = coverLevel;
+
+  return {
+    baseDR,
+    coverDR,
+    totalDR: baseDR + coverDR,
+    coverLevel
+  };
+}
+
+/**
  * Populate target selector dropdowns with available combatants
+ * Also populates extra damage dropdown based on successes
  * @param {jQuery} html - The chat message HTML
  */
 function populateTargetSelectors(html) {
   const selects = $(html).find(".damage-target-select");
   if (selects.length === 0) return;
+
+  // Populate extra damage dropdowns based on successes
+  $(html).find(".calc-extra-damage").each(function() {
+    const select = $(this);
+    const container = select.closest(".damage-calculator, .full-auto-hit-calc");
+    const successes = parseInt(container.find(".calc-successes").val()) || 1;
+    // Extra damage can be 0 to (successes - 1), since you need at least 1 success to hit
+    const maxExtra = Math.max(0, successes - 1);
+
+    select.empty();
+    for (let i = 0; i <= maxExtra; i++) {
+      select.append(`<option value="${i}">${i}</option>`);
+    }
+  });
 
   // Get available targets from combat or all actors
   let targets = [];
@@ -720,10 +764,47 @@ function populateTargetSelectors(html) {
   selects.each(function() {
     const select = $(this);
     select.empty();
-    select.append('<option value="">-- Select Target --</option>');
+    select.append(`<option value="">-- ${game.i18n.localize("YZECORIOLIS.SelectTarget")} --</option>`);
     for (const target of targets) {
       select.append(`<option value="${target.id}">${target.name}</option>`);
     }
+
+    // Add change listener to update DR when target is selected
+    select.off("change.drUpdate").on("change.drUpdate", function() {
+      const targetId = $(this).val();
+      const container = $(this).closest(".damage-calculator, .full-auto-hit-calc");
+      const drDisplay = container.find(".calc-target-dr-display");
+      const drHidden = container.find(".calc-target-dr");
+      const coverIndicator = container.find(".calc-cover-indicator");
+
+      if (!targetId) {
+        drDisplay.text("0");
+        drHidden.val("0");
+        coverIndicator.text("");
+        return;
+      }
+
+      const actor = game.actors.get(targetId);
+      if (!actor) {
+        drDisplay.text("0");
+        drHidden.val("0");
+        coverIndicator.text("");
+        return;
+      }
+
+      const drInfo = calculateActorDR(actor);
+      drDisplay.text(drInfo.totalDR);
+      drHidden.val(drInfo.totalDR);
+
+      // Show cover indicator
+      if (drInfo.coverLevel === 1) {
+        coverIndicator.text(`(+${drInfo.coverDR} ${game.i18n.localize("YZECORIOLIS.CoverLight")})`);
+      } else if (drInfo.coverLevel === 2) {
+        coverIndicator.text(`(+${drInfo.coverDR} ${game.i18n.localize("YZECORIOLIS.CoverHeavy")})`);
+      } else {
+        coverIndicator.text(drInfo.baseDR > 0 ? `(${game.i18n.localize("YZECORIOLIS.Armor")})` : "");
+      }
+    });
   });
 }
 

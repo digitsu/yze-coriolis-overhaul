@@ -251,16 +251,23 @@
             <summary><strong>{{localize "YZECORIOLIS.DamageCalculator"}}</strong></summary>
             <div class="damage-calc-inputs" style="margin-top: 0.5em;">
               <div class="flexrow" style="gap: 0.5em; align-items: center;">
+                <label style="flex: 0 0 auto;">{{localize "YZECORIOLIS.Target"}}:</label>
+                <select class="damage-target-select" style="flex: 1;"></select>
+              </div>
+              <div class="flexrow" style="gap: 0.5em; align-items: center; margin-top: 0.3em;">
                 <label style="flex: 1;">{{localize "YZECORIOLIS.ExtraDamage"}}:</label>
-                <input type="number" class="calc-extra-damage" value="0" min="0" max="{{results.successes}}" style="width: 3em; text-align: center;">
+                <select class="calc-extra-damage" style="width: 4em; text-align: center;"></select>
               </div>
               <div class="flexrow" style="gap: 0.5em; align-items: center; margin-top: 0.3em;">
                 <label style="flex: 1;">{{localize "YZECORIOLIS.TargetDR"}}:</label>
-                <input type="number" class="calc-target-dr" value="0" min="0" max="10" style="width: 3em; text-align: center;">
+                <span class="calc-target-dr-display" style="width: 3em; text-align: center; font-weight: bold;">0</span>
+                <span class="calc-cover-indicator" style="font-size: 0.8em; color: #888;"></span>
               </div>
               <input type="hidden" class="calc-base-damage" value="{{damage}}">
               <input type="hidden" class="calc-armor-pen" value="{{armorPenetration}}">
               <input type="hidden" class="calc-crit-threshold" value="{{crit}}">
+              <input type="hidden" class="calc-target-dr" value="0">
+              <input type="hidden" class="calc-successes" value="{{results.successes}}">
               <button type="button" class="calc-damage-btn" style="margin-top: 0.5em; width: 100%;">{{localize "YZECORIOLIS.Calculate"}}</button>
             </div>
             <div class="damage-calc-result" style="margin-top: 0.5em; display: none;">
@@ -279,11 +286,7 @@
                 <div class="result-crit-severity" style="font-size: 0.9em; font-weight: normal;"></div>
               </div>
               <div class="apply-damage-section" style="margin-top: 0.5em; padding-top: 0.5em; border-top: 1px solid #555;">
-                <div class="flexrow" style="gap: 0.5em; align-items: center;">
-                  <label style="flex: 0 0 auto;">{{localize "YZECORIOLIS.Target"}}:</label>
-                  <select class="damage-target-select" style="flex: 1;"></select>
-                </div>
-                <button type="button" class="apply-damage-btn" style="margin-top: 0.5em; width: 100%;">
+                <button type="button" class="apply-damage-btn" style="width: 100%;">
                   <i class="fas fa-heart-broken"></i> {{localize "YZECORIOLIS.ApplyDamage"}}
                 </button>
               </div>

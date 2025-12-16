@@ -95,16 +95,49 @@ Each character has actions per round that are tracked on their sheet:
 
 ---
 
-### 5. Damage Calculator
+### 5. Cover System
+
+Characters can take cover during combat for additional protection:
+
+**Cover States:**
+- **No Cover (0)**: No bonus to DR
+- **Light Cover (+1)**: Partial concealment, adds +1 to DR
+- **Heavy Cover (+2)**: Significant protection, adds +2 to DR
+
+**Setting Cover:**
+- In the combat tracker, click the shield icon next to your combatant
+- Each click cycles through: No Cover → Light Cover → Heavy Cover → No Cover
+- Cover state is displayed by icon and color:
+  - Gray person icon = No Cover
+  - Blue shield = Light Cover
+  - Green shield = Heavy Cover
+
+**Effect on Damage:**
+- Cover bonus is automatically added to DR when calculating damage
+- The damage calculator shows the cover modifier when a target is selected
+
+---
+
+### 6. Damage Calculator
 
 Weapon attacks include an integrated damage calculator:
 
 **How to use:**
 1. Roll a weapon attack
 2. If successful, expand the "Damage Calculator" section
-3. Enter **Extra Damage** (successes spent on damage, max = your successes)
-4. Enter **Target DR** (target's Damage Reduction from armor)
+3. Select a **Target** from the dropdown - DR is auto-calculated
+4. Select **Extra Damage** from dropdown (limited to available extra successes)
 5. Click **Calculate**
+
+**Extra Damage Validation:**
+- Extra damage is limited to (successes - 1), since at least 1 success is needed to hit
+- Example: With 3 successes, you can spend 0, 1, or 2 on extra damage
+
+**Auto-Calculated DR:**
+- When you select a target, their DR is automatically calculated from:
+  - Base DR from equipped armor
+  - Cover bonus (+1 for light, +2 for heavy)
+- A cover indicator shows if cover is contributing to DR
 
 **Calculation:**
 - Total Damage = Base Weapon Damage + Extra Damage
@@ -117,15 +150,14 @@ Weapon attacks include an integrated damage calculator:
 
 ---
 
-### 6. Damage Application
+### 7. Damage Application
 
 After calculating damage, you can apply it directly to a target:
 
 **How to use:**
-1. Calculate damage using the Damage Calculator
-2. Select a target from the dropdown (shows combatants or all actors)
-3. Click **Apply Damage**
-4. Target's HP is reduced and a chat message confirms the damage
+1. Select a target and calculate damage using the Damage Calculator
+2. Click **Apply Damage**
+3. Target's HP is reduced and a chat message confirms the damage
 
 **Target Selection:**
 - If a combat is active, the dropdown shows all combatants
@@ -134,7 +166,7 @@ After calculating damage, you can apply it directly to a target:
 
 ---
 
-### 7. Full Auto Attacks
+### 8. Full Auto Attacks
 
 Automatic weapons can fire in Full Auto mode for multiple attacks:
 
@@ -158,15 +190,16 @@ Automatic weapons can fire in Full Auto mode for multiple attacks:
 
 ---
 
-### 8. Combat Tracker Integration
+### 9. Combat Tracker Integration
 
 Combat Overhaul adds action buttons and quick attack directly to the combat tracker, eliminating the need to keep character sheets open during combat.
 
 **Combat Tracker Buttons:**
-Each combatant row displays four buttons:
+Each combatant row displays five buttons:
 - **S (Slow)**: Toggle slow action used/available
 - **F (Fast)**: Toggle fast action used/available
 - **Exchange Icon**: Trade your slow action for an extra fast action
+- **Shield Icon**: Cycle cover state (None → Light → Heavy)
 - **Crosshairs**: Quick Attack with primary weapon
 
 **Button Colors:**
@@ -174,6 +207,8 @@ Each combatant row displays four buttons:
 - Gray = Used/Inactive
 - Orange = Traded (slow traded for fast) or Trade button hover
 - Red = Lost (due to suppression)
+- Blue Shield = Light Cover
+- Green Shield = Heavy Cover
 
 **Permissions:**
 - Players can use buttons for their own characters
@@ -181,7 +216,7 @@ Each combatant row displays four buttons:
 
 ---
 
-### 9. Primary Weapon & Quick Attack
+### 10. Primary Weapon & Quick Attack
 
 Set a primary weapon for fast attacks from the combat tracker:
 
@@ -216,7 +251,7 @@ Set a primary weapon for fast attacks from the combat tracker:
 
 ---
 
-### 10. Armor and Damage Reduction
+### 11. Armor and Damage Reduction
 
 Combat Overhaul changes how armor works:
 

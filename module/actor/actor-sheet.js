@@ -528,12 +528,19 @@ export class yzecoriolisActorSheet extends ActorSheet {
    * @param {Event} event   The triggering click event
    * @private
    */
-  _onToggleItem(event) {
+  async _onToggleItem(event) {
     event.preventDefault();
     const itemId = event.currentTarget.closest(".item").dataset.itemId;
     const item = this.actor.items.get(itemId);
     const attr = "system.equipped";
-    return item.update({ [attr]: !foundry.utils.getProperty(item, attr) });
+    const isEquipping = !foundry.utils.getProperty(item, attr);
+
+    await item.update({ [attr]: isEquipping });
+
+    // If equipping a weapon and no primary weapon is set, make it the primary weapon
+    if (isEquipping && item.type === "weapon" && !this.actor.system.primaryWeapon) {
+      await this.actor.update({ "system.primaryWeapon": itemId });
+    }
   }
 
   /**
