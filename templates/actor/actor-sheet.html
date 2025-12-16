@@ -145,6 +145,69 @@
           </div>
         </li>
         {{/if}}
+        {{!-- Action Economy --}}
+        <li class="entry flexrow action-economy">
+          <div class="stat-label">{{localize "YZECORIOLIS.Actions"}}</div>
+          <div class="action-buttons">
+            {{!-- Slow Action --}}
+            {{#if system.actions.tradedSlow}}
+            <button type="button" class="action-btn traded" data-action="slow" title="{{localize "YZECORIOLIS.ActionSlowTraded"}}">
+              <i class="fas fa-exchange-alt"></i> {{localize "YZECORIOLIS.ActionSlowShort"}}
+            </button>
+            {{else if system.pinnedDown}}
+            <button type="button" class="action-btn lost" data-action="slow" title="{{localize "YZECORIOLIS.ActionSlowLost"}}">
+              <i class="fas fa-ban"></i> {{localize "YZECORIOLIS.ActionSlowShort"}}
+            </button>
+            {{else if system.actions.slowUsed}}
+            <button type="button" class="action-btn used" data-action="slow" title="{{localize "YZECORIOLIS.ActionSlowUsed"}}">
+              <i class="fas fa-check"></i> {{localize "YZECORIOLIS.ActionSlowShort"}}
+            </button>
+            {{else}}
+            <button type="button" class="action-btn available" data-action="slow" title="{{localize "YZECORIOLIS.ActionSlowAvailable"}}">
+              <i class="fas fa-clock"></i> {{localize "YZECORIOLIS.ActionSlowShort"}}
+            </button>
+            {{/if}}
+            {{!-- Fast Action 1 --}}
+            {{#if system.suppressed}}
+            <button type="button" class="action-btn lost" data-action="fast" title="{{localize "YZECORIOLIS.ActionFastLost"}}">
+              <i class="fas fa-ban"></i> {{localize "YZECORIOLIS.ActionFastShort"}}
+            </button>
+            {{else if system.actions.fastUsed}}
+            <button type="button" class="action-btn used" data-action="fast" title="{{localize "YZECORIOLIS.ActionFastUsed"}}">
+              <i class="fas fa-check"></i> {{localize "YZECORIOLIS.ActionFastShort"}}
+            </button>
+            {{else}}
+            <button type="button" class="action-btn available" data-action="fast" title="{{localize "YZECORIOLIS.ActionFastAvailable"}}">
+              <i class="fas fa-bolt"></i> {{localize "YZECORIOLIS.ActionFastShort"}}
+            </button>
+            {{/if}}
+            {{!-- Fast Action 2 (from traded slow) --}}
+            {{#if system.actions.tradedSlow}}
+              {{#if system.actions.fast2Used}}
+              <button type="button" class="action-btn used" data-action="fast2" title="{{localize "YZECORIOLIS.ActionFast2Used"}}">
+                <i class="fas fa-check"></i> {{localize "YZECORIOLIS.ActionFastShort"}}2
+              </button>
+              {{else}}
+              <button type="button" class="action-btn available" data-action="fast2" title="{{localize "YZECORIOLIS.ActionFast2Available"}}">
+                <i class="fas fa-bolt"></i> {{localize "YZECORIOLIS.ActionFastShort"}}2
+              </button>
+              {{/if}}
+            {{/if}}
+            {{!-- Trade/Reset buttons --}}
+            {{#unless system.actions.tradedSlow}}
+              {{#unless system.actions.slowUsed}}
+                {{#unless system.pinnedDown}}
+            <button type="button" class="action-trade-btn" title="{{localize "YZECORIOLIS.ActionTradeSlow"}}">
+              <i class="fas fa-exchange-alt"></i>
+            </button>
+                {{/unless}}
+              {{/unless}}
+            {{/unless}}
+            <button type="button" class="action-reset-btn" title="{{localize "YZECORIOLIS.ActionReset"}}">
+              <i class="fas fa-redo"></i>
+            </button>
+          </div>
+        </li>
         {{/if}}
         <li class="entry flexrow">
           <div class="capitalize stat-label">{{localize "YZECORIOLIS.MovementRate"}}</div>

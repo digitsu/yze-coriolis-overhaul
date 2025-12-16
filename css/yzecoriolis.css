@@ -1267,6 +1267,68 @@ amending some classes to help official modules work in v13
   background: rgba(0, 0, 0, 0.5);
   color: #fff;
 }
+/* Combat Overhaul: Action economy styles */
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy {
+  background-color: rgba(50, 80, 120, 0.2);
+  border-radius: 3px;
+  padding: 2px 5px;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-buttons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-btn {
+  border: 1px solid #666;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 0.85em;
+  min-width: 50px;
+  text-align: center;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-btn.available {
+  background: rgba(0, 100, 0, 0.4);
+  color: #8f8;
+  border-color: #4a4;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-btn.available:hover {
+  background: rgba(0, 100, 0, 0.6);
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-btn.used {
+  background: rgba(80, 80, 80, 0.4);
+  color: #aaa;
+  border-color: #666;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-btn.used:hover {
+  background: rgba(80, 80, 80, 0.6);
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-btn.traded {
+  background: rgba(100, 80, 0, 0.4);
+  color: #da6;
+  border-color: #a84;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-btn.lost {
+  background: rgba(100, 0, 0, 0.4);
+  color: #a66;
+  border-color: #844;
+  cursor: not-allowed;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-trade-btn,
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-reset-btn {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #666;
+  border-radius: 3px;
+  color: #ccc;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-trade-btn:hover,
+.yzecoriolis.sheet.actor .always-visible-stats .perma-stats-list .entry.action-economy .action-reset-btn:hover {
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
 .yzecoriolis.sheet.actor .char-content-wrapper {
   grid-column-start: 2;
   grid-column-end: 3;

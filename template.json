@@ -212,7 +212,13 @@
           "max": 10
         },
         "suppressed": false,
-        "pinnedDown": false
+        "pinnedDown": false,
+        "actions": {
+          "slowUsed": false,
+          "fastUsed": false,
+          "fast2Used": false,
+          "tradedSlow": false
+        }
       }
     },
     "character": {

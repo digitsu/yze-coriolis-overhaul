@@ -271,6 +271,41 @@ export class yzecoriolisActorSheet extends ActorSheet {
       this.actor.update({ "system.pinnedDown": false });
     });
 
+    // Combat Overhaul: Action economy buttons
+    html.find(".action-btn").click((ev) => {
+      ev.preventDefault();
+      const action = ev.currentTarget.dataset.action;
+      const actions = this.actor.system.actions || {};
+
+      if (action === "slow" && !this.actor.system.pinnedDown && !actions.tradedSlow) {
+        this.actor.update({ "system.actions.slowUsed": !actions.slowUsed });
+      } else if (action === "fast" && !this.actor.system.suppressed) {
+        this.actor.update({ "system.actions.fastUsed": !actions.fastUsed });
+      } else if (action === "fast2" && actions.tradedSlow) {
+        this.actor.update({ "system.actions.fast2Used": !actions.fast2Used });
+      }
+    });
+
+    html.find(".action-trade-btn").click((ev) => {
+      ev.preventDefault();
+      // Trade slow action for 2 fast actions
+      this.actor.update({
+        "system.actions.tradedSlow": true,
+        "system.actions.slowUsed": false
+      });
+    });
+
+    html.find(".action-reset-btn").click((ev) => {
+      ev.preventDefault();
+      // Reset all actions for new round
+      this.actor.update({
+        "system.actions.slowUsed": false,
+        "system.actions.fastUsed": false,
+        "system.actions.fast2Used": false,
+        "system.actions.tradedSlow": false
+      });
+    });
+
     // Update Inventory Item
     html.find(".item-edit").click((ev) => {
       const li = $(ev.currentTarget).parents(".item");

@@ -83,6 +83,32 @@ Hooks.on("renderCombatTracker", (app, html, combatInfo) => {
   }
 });
 
+// Combat Overhaul: Reset actions at the start of a new combat round
+Hooks.on("updateCombat", async (combat, updateData, options, userId) => {
+  // Only process if round changed and Combat Overhaul is enabled
+  if (!("round" in updateData)) return;
+  if (!game.settings.get("yzecoriolis", "combatOverhaul")) return;
+  if (!game.user.isGM) return;
+
+  // Reset actions for all combatants when a new round starts
+  for (const combatant of combat.combatants) {
+    const actor = combatant.actor;
+    if (!actor || actor.type === "ship") continue;
+
+    // Reset action tracking and clear suppression status for new round
+    await actor.update({
+      "system.actions.slowUsed": false,
+      "system.actions.fastUsed": false,
+      "system.actions.fast2Used": false,
+      "system.actions.tradedSlow": false,
+      "system.suppressed": false,
+      "system.pinnedDown": false
+    });
+  }
+
+  ui.notifications.info(game.i18n.localize("YZECORIOLIS.ActionsReset"));
+});
+
 function rerenderAllCrew() {
   // re render all characters/npcs to update their crew position drop downs.
   for (let e of game.actors.contents) {

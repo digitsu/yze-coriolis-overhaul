@@ -241,6 +241,9 @@ export const migrateActorData = function (actor) {
   // Combat Overhaul: Add stress tracking fields
   foundry.utils.mergeObject(updateData, migrateActorStressFields(actor));
 
+  // Combat Overhaul: Add action tracking fields
+  foundry.utils.mergeObject(updateData, migrateActorActionFields(actor));
+
   // Migrate Owned Items
   if (!actor.items) return updateData;
   const items = actor.items.reduce((arr, i) => {
@@ -449,6 +452,27 @@ export const migrateActorStressFields = function (actorData) {
   }
   if (actorData.system?.pinnedDown === undefined) {
     updates["system.pinnedDown"] = false;
+  }
+  return updates;
+};
+
+/**
+ * Ensure actor has action tracking fields for Combat Overhaul action economy
+ * @param {Object} actorData - The actor data
+ * @returns {Object} - Update data if migration needed
+ */
+export const migrateActorActionFields = function (actorData) {
+  if (actorData.type === "ship") {
+    return {};
+  }
+  const updates = {};
+  if (actorData.system?.actions === undefined) {
+    updates["system.actions"] = {
+      slowUsed: false,
+      fastUsed: false,
+      fast2Used: false,
+      tradedSlow: false
+    };
   }
   return updates;
 };
