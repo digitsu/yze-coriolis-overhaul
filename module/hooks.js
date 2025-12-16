@@ -53,6 +53,8 @@ Hooks.on("renderDialog", (dialog, html) => {
 Hooks.on("renderCombatTracker", (app, html, combatInfo) => {
   const currentCombat = combatInfo.combat;
   if (currentCombat) {
+    const combatOverhaul = game.settings.get("yzecoriolis", "combatOverhaul");
+
     $(html).find(".combatant").each((i, el) => {
       const id = el.dataset.combatantId;
       const combatant = currentCombat.combatants.find((c) => c.id === id);
@@ -60,7 +62,15 @@ Hooks.on("renderCombatTracker", (app, html, combatInfo) => {
 
       if (combatant.initiative != null) {
         const readOnly = game.user.isGM ? "" : "readonly";
-        initDiv.innerHTML = `<input style="color: white; "type="number" ${readOnly} value="${combatant.initiative}">`;
+
+        if (combatOverhaul) {
+          // D66 display: show as whole number, format nicely
+          const initValue = Math.floor(combatant.initiative);
+          initDiv.innerHTML = `<input style="color: white; width: 2.5em; text-align: center;" type="number" min="11" max="66" step="1" ${readOnly} value="${initValue}">`;
+        } else {
+          // Core Rules: decimal tiebreaker display
+          initDiv.innerHTML = `<input style="color: white;" type="number" ${readOnly} value="${combatant.initiative}">`;
+        }
 
         initDiv.addEventListener("change", async (e) => {
           const inputElement = e.target;
