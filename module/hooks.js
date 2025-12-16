@@ -1,6 +1,7 @@
 import { resetCrewForShip } from "./actor/crew.js";
 import { createBlankEPTokens, setActiveEPTokens } from "./item/ep-token.js";
 import { displayDarknessPoints } from "./darkness-points.js";
+import { CoriolisModifierDialog } from "./coriolisRollModifier.js";
 
 // eslint-disable-next-line no-unused-vars
 Hooks.on("updateUser", (entity, delta, options, userId) => {
@@ -137,6 +138,11 @@ function createCombatTrackerActions(actor, canControl) {
     fastIcon = "fa-check";
   }
 
+  // Trade button: enabled only when slow action is available and not used/lost
+  const canTrade = !actions.tradedSlow && !actions.slowUsed && !pinnedDown;
+  const tradeDisabled = (!canControl || !canTrade) ? "disabled" : "";
+  const tradeClass = actions.tradedSlow ? "active" : "";
+
   const disabled = canControl ? "" : "disabled";
 
   return `
@@ -146,6 +152,9 @@ function createCombatTrackerActions(actor, canControl) {
       </button>
       <button type="button" class="ct-action-btn ${fastClass}" data-action="fast" ${disabled} title="${game.i18n.localize("YZECORIOLIS.ActionFastShort")}">
         <i class="fas ${fastIcon}"></i>
+      </button>
+      <button type="button" class="ct-trade-btn ${tradeClass}" data-action="trade" ${tradeDisabled} title="${game.i18n.localize("YZECORIOLIS.TradeSlowForFast")}">
+        <i class="fas fa-exchange-alt"></i>
       </button>
       <button type="button" class="ct-quick-attack" ${disabled} title="${game.i18n.localize("YZECORIOLIS.QuickAttack")}">
         <i class="fas fa-crosshairs"></i>
@@ -174,6 +183,14 @@ function setupCombatTrackerActionListeners(container, actor) {
     await actor.update({ "system.actions.fastUsed": !actions.fastUsed });
   });
 
+  // Trade button - trade slow action for extra fast action
+  container.querySelector('[data-action="trade"]')?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    const actions = actor.system.actions || {};
+    if (actor.system.pinnedDown || actions.slowUsed || actions.tradedSlow) return;
+    await actor.update({ "system.actions.tradedSlow": true });
+  });
+
   // Quick attack button
   container.querySelector('.ct-quick-attack')?.addEventListener("click", async (e) => {
     e.stopPropagation();
@@ -198,23 +215,61 @@ async function performQuickAttack(actor) {
     return;
   }
 
-  // Trigger the weapon roll - this mimics clicking the weapon icon on the sheet
-  const isMelee = weapon.system.melee;
+  // Build proper rollData following the pattern from actor-sheet.js _onRoll
+  const actorData = actor.system;
+  const item = weapon.system;
+  const isMelee = item.melee;
   const skillKey = isMelee ? "meleecombat" : "rangedcombat";
   const attributeKey = isMelee ? "strength" : "agility";
 
-  // Import and call the roll function
-  const { coriolisRoll } = await import("./coriolis-roll.js");
+  // Get item modifiers for the skill
+  let itemModifiers = {};
+  if (actorData.itemModifiers && actorData.itemModifiers[skillKey]) {
+    itemModifiers = actorData.itemModifiers[skillKey];
+  } else if (actorData.itemModifiers && actorData.itemModifiers[attributeKey]) {
+    itemModifiers = actorData.itemModifiers[attributeKey];
+  }
 
-  coriolisRoll({
+  const combatOverhaul = game.settings.get("yzecoriolis", "combatOverhaul");
+
+  const rollData = {
+    actorType: actor.type,
     rollType: "weapon",
-    label: weapon.name,
-    skillKey: skillKey,
     attributeKey: attributeKey,
-    bonus: weapon.system.bonus,
-    automaticWeapon: weapon.system.automatic,
-    actor: actor
-  });
+    attribute: actorData.attributes[attributeKey]?.value || 0,
+    skillKey: skillKey,
+    skill: actorData.skills[skillKey]?.value || 0,
+    modifier: 0,
+    bonus: item.bonus ? Number(item.bonus) : 0,
+    rollTitle: weapon.name,
+    pushed: false,
+    isAutomatic: item.automatic,
+    isExplosive: item.explosive,
+    blastPower: item.blastPower,
+    blastRadius: item.blastRadius,
+    damage: item.damage,
+    damageText: item.damageText,
+    armorPenetration: item.armorPenetration || 0,
+    damageReduction: item.damageReduction || 0,
+    range: item.range,
+    crit: combatOverhaul ? item.critThreshold : item.crit?.numericValue,
+    critThreshold: item.critThreshold || 0,
+    critText: item.crit?.customValue,
+    features: item.special ? Object.values(item.special).join(", ") : "",
+    itemModifiers: itemModifiers,
+    combatOverhaul: combatOverhaul,
+    // Combat Tracker Quick Attack data
+    fromCombatTracker: true,
+    combatTrackerActor: actor,
+    isMeleeWeapon: isMelee,
+  };
+
+  const chatOptions = actor._prepareChatRollOptions(
+    "systems/yzecoriolis/templates/sidebar/roll.html",
+    "weapon"
+  );
+
+  new CoriolisModifierDialog(rollData, chatOptions).render(true);
 }
 
 // Combat Overhaul: Reset actions at the start of a new combat round

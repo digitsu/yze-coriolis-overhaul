@@ -20,6 +20,10 @@ export class CoriolisModifierDialog extends FormApplication {
       this.itemModifiers = rollData.gunnerToChoose
         ? this.crewMembersControlled[this.gunnerChoosen].system.itemModifiers.rangedcombat
         : rollData.itemModifiers;
+      // Combat Tracker Quick Attack support
+      this.fromCombatTracker = rollData.fromCombatTracker || false;
+      this.combatTrackerActor = rollData.combatTrackerActor || null;
+      this.isMeleeWeapon = rollData.isMeleeWeapon || false;
     }
   
     static get defaultOptions() {
@@ -52,6 +56,11 @@ export class CoriolisModifierDialog extends FormApplication {
           gunnerToChoose: this.gunnerToChoose,
           gunnerChoosen: this.gunnerChoosen,
           gunnerList: this.crewMembersControlled,
+          // Combat Tracker Quick Action
+          fromCombatTracker: this.fromCombatTracker,
+          quickActionLabel: this.isMeleeWeapon
+            ? game.i18n.localize("YZECORIOLIS.QuickStrike")
+            : game.i18n.localize("YZECORIOLIS.QuickShot"),
         };
     }
   
@@ -59,7 +68,7 @@ export class CoriolisModifierDialog extends FormApplication {
       super.activateListeners(html);
     }
 
-    async _onChangeInput(event) {    
+    async _onChangeInput(event) {
       if (event.currentTarget.name === "dialogRollMode") {
         this.rollMode = event.currentTarget.value;
       }
@@ -84,7 +93,26 @@ export class CoriolisModifierDialog extends FormApplication {
 
     async _updateObject(event, formData) {
       this.chatOptions.rollMode = this.rollMode;
-      this.rollData.modifier = parseInt(event.submitter.value);
+
+      // Parse button value - can be "normal:0", "quick:0", or just a number
+      const buttonValue = event.submitter.value;
+      let isQuickAction = false;
+
+      if (this.fromCombatTracker && buttonValue.includes(":")) {
+        // Combat tracker button format: "normal:modifier" or "quick:modifier"
+        const [actionType, modifier] = buttonValue.split(":");
+        isQuickAction = actionType === "quick";
+        this.rollData.modifier = parseInt(modifier);
+
+        // Apply -2 penalty for Quick Shot/Strike
+        if (isQuickAction) {
+          this.rollData.modifier -= 2;
+        }
+      } else {
+        // Standard modifier button
+        this.rollData.modifier = parseInt(buttonValue);
+      }
+
       this.rollData.automaticFire = this.automaticFire;
       this.rollData.machineGunner = this.machineGunner ? 1 : 0;
       this.rollData.highCapacity = this.highCapacity ? 1 : 0;
@@ -97,7 +125,21 @@ export class CoriolisModifierDialog extends FormApplication {
         this.rollData.skill = this.crewMembersControlled[this.gunnerChoosen].system.skills.rangedcombat.value;
         this.rollData.rollTitle = game.i18n.localize("YZECORIOLIS.CrewSpotGunner") + " " + this.rollData.gunnerName + "\n- " + this.rollData.ship;
       }
-      coriolisRoll(this.chatOptions, this.rollData);
+
+      // Execute the roll
+      await coriolisRoll(this.chatOptions, this.rollData);
+
+      // Combat Tracker: Spend the appropriate action after the roll
+      if (this.fromCombatTracker && this.combatTrackerActor) {
+        if (isQuickAction) {
+          // Quick Shot/Strike uses Fast action
+          await this.combatTrackerActor.update({ "system.actions.fastUsed": true });
+        } else {
+          // Normal attack uses Slow action
+          await this.combatTrackerActor.update({ "system.actions.slowUsed": true });
+        }
+      }
+
       return;
     }
   }

@@ -2124,12 +2124,26 @@ amending some classes to help official modules work in v13
 }
 .yzecoriolis.sheet.actor .sheet-body .gear-list .primary-weapon-select {
   flex: 1;
-  background: rgba(0, 0, 0, 0.3);
+  background-color: #1a1a2e !important;
   border: 1px solid #666;
   border-radius: 3px;
-  color: #e5e5e5;
+  color: #e5e5e5 !important;
   padding: 3px 5px;
   font-family: "Cairo";
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e5e5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 25px;
+}
+.yzecoriolis.sheet.actor .sheet-body .gear-list .primary-weapon-select:focus {
+  outline: 1px solid #9fb0ed;
+}
+.yzecoriolis.sheet.actor .sheet-body .gear-list .primary-weapon-select option {
+  background-color: #1a1a2e !important;
+  color: #e5e5e5 !important;
 }
 .yzecoriolis.sheet.actor .sheet-body .gear-list .gear-category-name {
   font-size: 14px;
@@ -3416,4 +3430,90 @@ select[name="core.uiConfig.colorScheme.applications"]{
 .combatant-actions .ct-quick-attack:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+.combatant-actions .ct-trade-btn {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: rgba(80, 80, 80, 0.6);
+  color: #aaa;
+  border-color: #666;
+}
+.combatant-actions .ct-trade-btn:hover:not(:disabled) {
+  background: rgba(100, 80, 0, 0.6);
+  color: #da6;
+  border-color: #a84;
+}
+.combatant-actions .ct-trade-btn.active {
+  background: rgba(100, 80, 0, 0.6);
+  color: #da6;
+  border-color: #a84;
+}
+.combatant-actions .ct-trade-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ----------------------------------------- */
+/*  Roll Dialog Quick Action Styling         */
+/* ----------------------------------------- */
+#coriolisModifierDialog .quick-action-buttons {
+  padding: 1em;
+}
+#coriolisModifierDialog .quick-action-buttons h3 {
+  margin: 0 0 0.5em 0;
+  text-align: center;
+}
+#coriolisModifierDialog .action-type-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+#coriolisModifierDialog .action-type-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #444;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+#coriolisModifierDialog .action-type-btn i {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+#coriolisModifierDialog .action-type-btn .action-note {
+  font-size: 11px;
+  font-weight: normal;
+  opacity: 0.8;
+}
+#coriolisModifierDialog .action-type-btn.normal-attack {
+  background: rgba(0, 80, 120, 0.6);
+  color: #8cf;
+  border-color: #4a8;
+}
+#coriolisModifierDialog .action-type-btn.normal-attack:hover {
+  background: rgba(0, 100, 150, 0.8);
+  border-color: #6ca;
+}
+#coriolisModifierDialog .action-type-btn.quick-attack {
+  background: rgba(120, 80, 0, 0.6);
+  color: #fc8;
+  border-color: #a84;
+}
+#coriolisModifierDialog .action-type-btn.quick-attack:hover {
+  background: rgba(150, 100, 0, 0.8);
+  border-color: #ca6;
 }

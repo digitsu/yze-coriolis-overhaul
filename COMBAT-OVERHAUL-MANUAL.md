@@ -163,15 +163,16 @@ Automatic weapons can fire in Full Auto mode for multiple attacks:
 Combat Overhaul adds action buttons and quick attack directly to the combat tracker, eliminating the need to keep character sheets open during combat.
 
 **Combat Tracker Buttons:**
-Each combatant row displays three buttons:
+Each combatant row displays four buttons:
 - **S (Slow)**: Toggle slow action used/available
 - **F (Fast)**: Toggle fast action used/available
+- **Exchange Icon**: Trade your slow action for an extra fast action
 - **Crosshairs**: Quick Attack with primary weapon
 
 **Button Colors:**
 - Green = Available
-- Gray = Used
-- Orange = Traded (slow traded for fast)
+- Gray = Used/Inactive
+- Orange = Traded (slow traded for fast) or Trade button hover
 - Red = Lost (due to suppression)
 
 **Permissions:**
@@ -191,8 +192,22 @@ Set a primary weapon for fast attacks from the combat tracker:
 
 **Using Quick Attack:**
 1. In the combat tracker, click the crosshairs icon next to your combatant
-2. The system automatically rolls an attack with your primary weapon
-3. The roll uses the appropriate skill (Ranged Combat or Melee Combat) based on weapon type
+2. A roll dialog appears with an option for **Quick Shot** (ranged) or **Quick Strike** (melee)
+3. Choose your attack type:
+   - **Normal Attack**: Uses your Slow action (no penalty)
+   - **Quick Shot/Strike**: Uses your Fast action with a **-2 penalty**
+4. The appropriate action is automatically marked as used after the roll
+
+**Quick Shot / Quick Strike:**
+- Allows you to attack using your Fast action instead of Slow action
+- Applies a -2 modifier to the attack roll
+- Useful when you've already used your Slow action or want to save it
+
+**Automatic Action Spending:**
+- When attacking via the combat tracker, the system automatically spends the appropriate action
+- Normal attack → Slow action marked as used
+- Quick Shot/Strike → Fast action marked as used
+- Actions can be reset via the character sheet or when a new combat round begins
 
 **Notes:**
 - If no primary weapon is set, clicking Quick Attack shows a warning

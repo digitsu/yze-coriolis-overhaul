@@ -1,0 +1,15 @@
+<div class="quick-action-buttons">
+    <h3>{{localize "YZECORIOLIS.ChooseAttackType"}}</h3>
+    <div class="action-type-row">
+        <button type="submit" class="action-type-btn normal-attack" value="normal:0">
+            <i class="fas fa-clock"></i>
+            {{localize "YZECORIOLIS.NormalAttack"}}
+            <span class="action-note">{{localize "YZECORIOLIS.UsesSlowAction"}}</span>
+        </button>
+        <button type="submit" class="action-type-btn quick-attack" value="quick:0">
+            <i class="fas fa-bolt"></i>
+            {{quickActionLabel}}
+            <span class="action-note">{{localize "YZECORIOLIS.UsesFastAction"}} (-2)</span>
+        </button>
+    </div>
+</div>
