@@ -8,6 +8,10 @@ This is a fork of the official [one](https://github.com/hodpub/yze-coriolis.git)
 
 1. Go to your foundry data folder (login to foundry, Settings->Foundry Data folder to see where it is for you) and then in the Data/modules directory, git clone this repository.
 
+## Documentation
+
+Detailed documentation of the combat overhaul features added can be found [here](https://github.com/digitsu/yze-coriolis-overhaul/blob/master/COMBAT-OVERHAUL-MANUAL.md)
+
 ## Official Modules
 
 To save time recreating hundreds of items, journals, NPCs, and maps from the official print or PDF source material, there are a official modules available:
