@@ -1,14 +1,12 @@
-![Banner](https://github.com/winks-vtt/yze-coriolis/raw/master/images/coriolis-banner.png)
 
-# Coriolis
+# Coriolis Reloaded: Combat Overhaul (compatible with CORE official system as well)
 
-The **Official** system for playing [Coriolis](https://frialigan.se/en/games/coriolis-2/) on Foundry VTT.
+The **UN-Official** system for playing [Coriolis](https://frialigan.se/en/games/coriolis-2/) on Foundry VTT, modified to use the optional Coriolis Reloaded: Combat Overhaul modified combat rules.
+This is a fork of the official [one](https://github.com/hodpub/yze-coriolis.git) and has all the functionality of it, but is a fork because AI coding tools were used to assist in the development and testing of the module, and Foundry has a strict no AI rule, which applies even when AI tools like copilot are used for code development.  This module will strive to maintain feature parity and be up-to-date with any changes in the official fork, but is subject to being maintained by the community.  I also added MIT licensing to this fork and all its modifications, whereas the original module did not have any license specified for the module code. (only OGL for the game system).
 
 ## Installation
 
-1. Inside Foundry's Configuration and Setup screen, go to **Game Systems**
-2. Click "Install System"
-3. In the Manifest URL field paste: `https://raw.githubusercontent.com/winks-vtt/yze-coriolis/master/system.json`
+1. Go to your foundry data folder (login to foundry, Settings->Foundry Data folder to see where it is for you) and then in the Data/modules directory, git clone this repository.
 
 ## Official Modules
 
@@ -18,71 +16,67 @@ To save time recreating hundreds of items, journals, NPCs, and maps from the off
 - [Last Voyage of the Ghazali](https://foundryvtt.com/packages/coriolis-ghazali)
 - [Emissary Lost](https://foundryvtt.com/packages/coriolis-emissarylost)
 
-## Features
+## Features (in addition to the original modules' features)
 
-![Character Sheet](https://github.com/winks-vtt/yze-coriolis/raw/master/images/char_sheet_preview.png)
+<img width="1007" height="809" alt="charsheet2" src="https://github.com/user-attachments/assets/2ab2780d-8b74-4f8f-a1d0-6197b3751ac4" />
 
-- Character sheets for PCs
-- Ship sheets for crew ships
-- Ability to roll Skills and Attributes
-- Can create Talents, Weapons, Gear, Armor and drag-n-drop onto character sheets.
-- Can click on weapons to roll with bonus modifiers
-- Can push rolls in chat
-- Can do armor rating rolls
-- Be able to track Darkness Points
-- Track encumbrance in the inventory tab
-- Support for [Dice So Nice](https://gitlab.com/riccisi/foundryvtt-dice-so-nice) with custom Dice skins
+- Slow, Fast Action economy buttons, with reset and trade
+- Combat tab integration, adding the action buttons and a quick attack button, allowing you to attack using your primary weapon
+- Modified the weapons and armor and rules to accomodate the changes is how critical successes are handled in CO.
+- Added the stress mechanic
+- Added the stress table
+- Allow for the assignment of damage to a target after you attack, allowing for the choice of what to do with your extra successes
+- Incorporated Damage Reduction rules, cover rules, auto-fire, and suppression rules
 
 ## How-Tos
 
-### Modifying Rolls
+### Initiative
 
-![Modifying Rolls](https://github.com/winks-vtt/yze-coriolis/raw/master/images/ht_modifier_rolls.gif)
+Now follows the published D66 format, to be compatible with the Icon deck card initiative method.
 
-When selecting an attribute or skill, a pop up will request a modifier to any roll coming from the character sheet.
+<img width="293" height="614" alt="initiative" src="https://github.com/user-attachments/assets/4dc4aa48-8b01-4554-99fd-ca03d89b970b" />
 
-### Pushing Rolls
 
-![Pushing Rolls](https://github.com/winks-vtt/yze-coriolis/raw/master/images/ht_push_rolls.gif)
+### Autofire 
 
-To push a roll, click on the "pray to the Icons" button under the roll in the chat window
+<img width="298" height="912" alt="autofire" src="https://github.com/user-attachments/assets/a31a377d-f6e2-44a8-ab6a-e15ea3ebacd7" />
+
+
+### Rolling Damage Rolls
+
+<img width="285" height="649" alt="attackroll" src="https://github.com/user-attachments/assets/dc8ff966-e7cd-43b5-bc57-5301b0e00a7c" />
+
+
+After a successful attack, you can run the Damage Calculator to work out damage, (calculate according to the upgraded rules) and assign to the target or targets (if using auto-fire).
+
+<img width="286" height="436" alt="damagecalc" src="https://github.com/user-attachments/assets/1c9f931f-b270-4206-b05d-39f8181cc476" />
+
+
+Suppression is now tracked
+
+<img width="289" height="351" alt="supression" src="https://github.com/user-attachments/assets/04516cad-c4ca-4042-b0a3-f7903f7145fd" />
+
+
+### Slow/Fast Action economy
+
+<img width="389" height="356" alt="combatbar1" src="https://github.com/user-attachments/assets/4e43cca9-5b2a-49d9-b3a6-d1908b5837b2" />
+
+
+Hot-key buttons on the combat tab, which track which actions you have used, and also what you have left.  Also a convenient "attack with primary weapon" button. No more fishing for your weapon in your sheet to just do an attack roll! Set your primary weapon in your items tab.
 
 ### Using Weapons and Armor
 
-![Using Items](https://github.com/winks-vtt/yze-coriolis/raw/master/images/ht_use_items.gif)
-
-Weapons, Explosives, and Armor can be rolled in the items tab. You can click on the name of the item to unfold further details, or click on the icon of the item to roll. Rollable items will fade to a dice icon.
-
-### Handling Darkness Points
-
-![Darkness Points Tools](https://github.com/winks-vtt/yze-coriolis/raw/master/images/dp_bar.png)
-
-- The GM can increment or decrement darkness points via the tool bar on the left.
-- Whenever a player pushes a roll, 1 DP is added to the DB pool of the GM.
-- The GM can peek at the current darkness points via the "?" button in the tool bar.
-
-### Updating Character Art
-
-The system comes with placeholder art-work. To change it, click on the upper 3rd of the art-work to upload a new one. For reference, the placeholder artwork is 604x1488 pixels. The slot is designed for easily dropping in character art from the core rulebook.
-
-## Recommended Modules
-
-- [Dice So Nice](https://gitlab.com/riccisi/foundryvtt-dice-so-nice)
+Weapons, Explosives, and Armor updated to have both stats for Combat Overhaul crit and DR system, while still maintaining compatibility with the original core system stats.
 
 ## Todos
 
-- Update styling of dice rolls in chat log
-- Update styling of supporting item/weapon sheets
+- Minions rules
+- Critical success effects automatically affected onto the target sheets.
 
 ## Support
 
-For questions, feature requests, or bug reports, feel free to contact me on the Foundry Discord (Winks#1731) or open an issue here directly.
+For questions, feature requests, or bug reports, feel free to contact me on the Foundry Discord (burninator#8858) or open an issue here directly.
 
-## Art Credits
-
-- Placeholder character key art: By [Alex Okafor](http://www.paradeofrain.com/) under [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/).
-- Character sheet icons: by [LORC](https://lorcblog.blogspot.com/) under [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/).
-- Character Sheet background: NASA Hubble under [Public Domain](https://hubblesite.org/about_us/copyright.php).
 
 ## License
 
