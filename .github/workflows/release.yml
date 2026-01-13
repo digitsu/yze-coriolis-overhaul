@@ -120,11 +120,13 @@ jobs:
       # For initial release, manually submit at: https://foundryvtt.com/packages/submit
       # Then add PACKAGE_TOKEN secret for automatic updates on future releases.
       - name: Send package to foundry
-        if: ${{ steps.release_pr.outputs.release_created && secrets.PACKAGE_TOKEN }}
+        if: ${{ steps.release_pr.outputs.release_created }}
         continue-on-error: true
+        env:
+          PACKAGE_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
         run: |
           HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST 'https://foundryvtt.com/_api/packages/release_version/' \
-          --header 'Authorization: ${{ secrets.PACKAGE_TOKEN }}' \
+          --header "Authorization: ${PACKAGE_TOKEN}" \
           --header 'Content-Type: application/json' \
           --data '{
               "id": "${{env.package_id}}",
