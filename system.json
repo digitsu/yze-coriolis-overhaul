@@ -1,8 +1,8 @@
 {
-    "id": "yzecoriolis",
-    "title": "Coriolis",
-    "description": "Coriolis System for Foundry VTT.",
-    "version": "4.1.0",
+    "id": "yze-coriolis-overhaul",
+    "title": "Coriolis Reloaded: Combat Overhaul",
+    "description": "Enhanced Coriolis system for Foundry VTT featuring the optional Combat Overhaul rules from Coriolis Reloaded. Includes action economy tracking, stress mechanics, damage reduction, autofire, suppression, and D66 initiative. Fork of yzecoriolis by Alex Okafor and Winks.",
+    "version": "4.2.0",
     "compatibility": {
         "minimum": "13",
         "verified": "13",
@@ -11,7 +11,15 @@
     "templateVersion": 2,
     "authors": [
         {
-            "name": "Winks"
+            "name": "the burninator",
+            "discord": "digitsu#8858",
+            "url": "https://github.com/digitsu"
+        },
+        {
+            "name": "Winks (original yzecoriolis)"
+        },
+        {
+            "name": "Alex Okafor (original yzecoriolis)"
         }
     ],
     "esmodules": [
@@ -22,13 +30,6 @@
         "css/yzecoriolis.css",
         "css/yzecoriolismce.css"
     ],
-    "relationships": {
-        "systems": [
-            {
-                "id": "yzecoriolis"
-            }
-        ]
-    },
     "scripts": [],
     "packs": [
         {
@@ -36,7 +37,7 @@
             "label": "Ship Sheet Instructions",
             "path": "packs/ship-sheet-instructions.db",
             "type": "JournalEntry",
-            "module": "Coriolis"
+            "system": "yze-coriolis-overhaul"
         }
     ],
     "languages": [
@@ -77,8 +78,11 @@
     },
     "primaryTokenAttribute": "health",
     "secondaryTokenAttribute": "power",
-    "url": "",
+    "url": "https://github.com/digitsu/yze-coriolis-overhaul",
+    "bugs": "https://github.com/digitsu/yze-coriolis-overhaul/issues",
+    "changelog": "https://github.com/digitsu/yze-coriolis-overhaul/blob/master/CHANGELOG.md",
+    "license": "LICENSE",
     "protected": false,
-    "manifest": "https://github.com/digitsu/yze-coriolis/releases/latest/download/system.json",
-    "download": "https://github.com/digitsu/yze-coriolis/releases/download/v4.1.0/coriolis.zip"
+    "manifest": "https://github.com/digitsu/yze-coriolis-overhaul/releases/latest/download/system.json",
+    "download": "https://github.com/digitsu/yze-coriolis-overhaul/releases/download/v4.2.0/yze-coriolis-overhaul.zip"
 }

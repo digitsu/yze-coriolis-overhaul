@@ -12,7 +12,8 @@ permissions:
 
 env:
   package_type: system
-  package_id: yzecoriolis
+  package_id: yze-coriolis-overhaul
+  zip_name: yze-coriolis-overhaul.zip
 
 jobs:
   create-release:
@@ -25,13 +26,13 @@ jobs:
           release-type: simple
 
       # grab our branch from the above PR
-      - uses: actions/github-script@v3
+      - uses: actions/github-script@v7
         id: checkout_branch
         if: ${{ steps.release_pr.outputs.pr && !steps.release_pr.outputs.release_created }}
         with:
           script: |
             const pr = ${{ steps.release_pr.outputs.pr }};
-            const response = await github.pulls.get({
+            const response = await github.rest.pulls.get({
               pull_number: pr.number,
               owner: context.repo.owner,
               repo: context.repo.repo
@@ -40,7 +41,7 @@ jobs:
             core.setOutput("branch", response.data.head.ref);
 
       # checkout PR branch
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ steps.checkout_branch.outputs.branch }}
         if: ${{ steps.release_pr.outputs.pr && !steps.release_pr.outputs.release_created }}
@@ -60,7 +61,7 @@ jobs:
         env:
           version: ${{ env.sys_version }}
           manifest: https://github.com/${{github.repository}}/releases/latest/download/system.json
-          download: https://github.com/${{github.repository}}/releases/download/v${{env.sys_version}}/coriolis.zip
+          download: https://github.com/${{github.repository}}/releases/download/v${{env.sys_version}}/${{env.zip_name}}
 
       # with the initially opened PR, update our system.json
       - name: "Commit system.json"
@@ -78,22 +79,22 @@ jobs:
       # 3. update FVTT admin panel with latest release metadata
 
       # checkout release branch
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: ${{ steps.release_pr.outputs.release_created }}
 
       # zip our assets
       - name: "Create Zipped Artifact"
         if: ${{ steps.release_pr.outputs.release_created }}
-        run: zip -r ./coriolis.zip LICENSE README.md CHANGELOG.md system.json template.json css/ data/ images/ lang/ lib/ module/ packs/ templates/
+        run: zip -r ./${{env.zip_name}} LICENSE README.md CHANGELOG.md system.json template.json css/ data/ images/ lang/ module/ packs/ scripts/ templates/
 
       # upload zip artifact
-      - name: "📦 Add coriolis.zip to Release 📦"
+      - name: "📦 Add system zip to Release 📦"
         if: ${{ steps.release_pr.outputs.release_created }}
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: coriolis.zip
-          asset_name: coriolis.zip
+          file: ${{env.zip_name}}
+          asset_name: ${{env.zip_name}}
           tag: v${{ steps.release_pr.outputs.major }}.${{ steps.release_pr.outputs.minor }}.${{ steps.release_pr.outputs.patch }}
           overwrite: true
 
@@ -115,8 +116,12 @@ jobs:
           cat ${{ env.package_type }}.json | jq .compatibility >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
+      # This step requires PACKAGE_TOKEN secret and the package to be registered on Foundry first.
+      # For initial release, manually submit at: https://foundryvtt.com/packages/submit
+      # Then add PACKAGE_TOKEN secret for automatic updates on future releases.
       - name: Send package to foundry
-        if: ${{ steps.release_pr.outputs.release_created }}
+        if: ${{ steps.release_pr.outputs.release_created && secrets.PACKAGE_TOKEN }}
+        continue-on-error: true
         run: |
           HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST 'https://foundryvtt.com/_api/packages/release_version/' \
           --header 'Authorization: ${{ secrets.PACKAGE_TOKEN }}' \
@@ -130,18 +135,19 @@ jobs:
                   "compatibility": ${{ env.COMPATIBILITY }}
               }
           }')
-          
+
           # extract the body
           HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
-          
+
           # extract the status
           HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-          
+
           # print the body
           echo "$HTTP_BODY"
-          
+
           # example using the status
           if [ ! $HTTP_STATUS -eq 200  ]; then
-            echo "Error [HTTP status: $HTTP_STATUS]"
-            exit 1
+            echo "Warning: Failed to update Foundry package registry [HTTP status: $HTTP_STATUS]"
+            echo "This is expected for first release. Submit manually at: https://foundryvtt.com/packages/submit"
+            exit 0
           fi

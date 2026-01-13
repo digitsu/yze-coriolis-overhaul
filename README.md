@@ -79,7 +79,7 @@ Weapons, Explosives, and Armor updated to have both stats for Combat Overhaul cr
 
 ## Support
 
-For questions, feature requests, or bug reports, feel free to contact me on the Foundry Discord (burninator#8858) or open an issue here directly.
+For questions, feature requests, or bug reports, feel free to contact me on the Foundry Discord (digitsu#8858) or open an issue here directly.
 
 
 ## License
