@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.2.0](https://github.com/digitsu/yze-coriolis-overhaul/compare/v4.1.0...v4.2.0) (2026-01-13)
+
+
+### Features
+
+* prepare v4.2.0 release as standalone Coriolis Reloaded system ([eb1ca77](https://github.com/digitsu/yze-coriolis-overhaul/commit/eb1ca77995296fd171a62b79cab50332a266ede9))
+
+
+### Bug Fixes
+
+* remove invalid secrets check from workflow condition ([e23cedd](https://github.com/digitsu/yze-coriolis-overhaul/commit/e23cedd3b66ff5b20b4c6b0eaa9739953879b61e))
+
 ## [4.1.0](https://github.com/digitsu/yze-coriolis/compare/v4.2.0...v4.1.0) (2025-12-16)
 
 
