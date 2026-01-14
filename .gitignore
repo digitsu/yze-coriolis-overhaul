@@ -17,3 +17,7 @@ packs/ship-sheet-instructions/
 .gitignore
 
 .linkedToFoundry
+
+# Claude Code
+.claude/
+CLAUDE.md
